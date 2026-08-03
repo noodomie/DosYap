@@ -302,6 +302,17 @@
     <script>
         let captchaCode = '';
 
+        function formatFileSize(bytes) {
+            if (!bytes || bytes === 0) return '0 B';
+            if (bytes < 1024) {
+                return bytes + ' B';
+            } else if (bytes < 1024 * 1024) {
+                return (bytes / 1024).toFixed(2).replace(/\.00$/, '') + ' KB';
+            } else {
+                return (bytes / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB';
+            }
+        }
+
         function generateCaptcha() {
             const canvas = document.getElementById('captchaCanvas');
             const ctx = canvas.getContext('2d');
@@ -435,11 +446,11 @@
                 document.getElementById('view-title').innerText = data.title;
                 document.getElementById('view-desc').innerText = data.description || 'Açıklama yok';
                 document.getElementById('view-filename').innerText = data.originalName;
-                document.getElementById('view-size').innerText = (data.size / (1024 * 1024)).toFixed(2) + ' MB';
+                document.getElementById('view-size').innerText = formatFileSize(data.size);
 
                 const dlBtn = document.getElementById('downloadBtn');
                 dlBtn.onclick = () => {
-                    window.open(data.downloadUrl, '_blank');
+                    window.location.href = data.downloadUrl;
                 };
 
                 document.getElementById('download-card').classList.remove('hidden');
