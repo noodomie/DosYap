@@ -3,7 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DosYap - Dosya Paylaşımı</title>
+    <title>DosYap - Hızlı ve Güvenli Dosya Paylaşımı</title>
+
+    <!-- Social Media Link Önizleme Etiketleri (Open Graph / Instagram / WhatsApp) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="DosYap">
+    <meta property="og:title" content="DosYap - Dosya Paylaşım Platformu">
+    <meta property="og:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
+    <!-- Instagram/WhatsApp kartında görünecek logonun adresi (Kendi domain logolarınızı buraya bağlayabilirsiniz) -->
+    <meta property="og:image" content="https://example.com/logo-preview.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter Card Etiketleri -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DosYap - Dosya Paylaşım Platformu">
+    <meta name="twitter:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
+    <meta name="twitter:image" content="https://example.com/logo-preview.png">
+
+    <!-- Tarayıcı Sekme İkonu (Favicon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/><polyline points='14 2 14 8 20 8'/><path d='M12 18v-6'/><path d='m9 15 3-3 3 3'/></svg>">
+
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -72,7 +93,6 @@
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
-        /* Yumuşak Geçiş Animasyonları */
         .card:not(.hidden) {
             animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -88,11 +108,25 @@
             }
         }
 
+        /* Logo Stilleri */
+        .logo-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .brand-logo {
+            width: 32px;
+            height: 32px;
+            stroke: var(--btn-primary);
+            flex-shrink: 0;
+        }
+
         .header-title {
             font-size: 22px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 6px;
             letter-spacing: -0.5px;
         }
 
@@ -251,7 +285,15 @@
 <body>
 
     <div id="verify-card" class="card">
-        <div class="header-title">Bot Doğrulaması</div>
+        <div class="logo-wrapper">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18v-6"/>
+                <path d="m9 15 3-3 3 3"/>
+            </svg>
+            <div class="header-title">Bot Doğrulaması</div>
+        </div>
         <div class="header-desc">Devam etmek için aşağıdaki güvenlik kodunu girin.</div>
         
         <div class="form-group">
@@ -268,13 +310,29 @@
     </div>
 
     <div id="main-card" class="card hidden">
-        <div class="header-title">DosYap</div>
+        <div class="logo-wrapper">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18v-6"/>
+                <path d="m9 15 3-3 3 3"/>
+            </svg>
+            <div class="header-title">DosYap</div>
+        </div>
         <div class="header-desc">Ücretsiz dosya paylaşım platformu.</div>
         <button onclick="openModal()">Oluştur</button>
     </div>
 
     <div id="modal-card" class="card hidden">
-        <div class="header-title">Dosya Yükle</div>
+        <div class="logo-wrapper">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18v-6"/>
+                <path d="m9 15 3-3 3 3"/>
+            </svg>
+            <div class="header-title">Dosya Yükle</div>
+        </div>
         <div class="header-desc">Paylaşmak istediğiniz dosya detaylarını girin.</div>
         <form id="uploadForm">
             <div class="form-group">
@@ -295,7 +353,15 @@
     </div>
 
     <div id="result-card" class="card hidden">
-        <div class="header-title">Dosya Hazır</div>
+        <div class="logo-wrapper">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18v-6"/>
+                <path d="m9 15 3-3 3 3"/>
+            </svg>
+            <div class="header-title">Dosya Hazır</div>
+        </div>
         <div class="header-desc">Aşağıdaki link ile dosyanızı paylaşabilirsiniz.</div>
         <div class="link-box" id="generated-link"></div>
         <button onclick="copyLink()">Kopyala</button>
@@ -303,7 +369,15 @@
     </div>
 
     <div id="download-card" class="card hidden">
-        <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
+        <div class="logo-wrapper">
+            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <path d="M12 18v-6"/>
+                <path d="m9 15 3-3 3 3"/>
+            </svg>
+            <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
+        </div>
         <div class="header-desc">Bir DosYap dosyası.</div>
         <div class="file-info-list">
             <div class="file-info-item">
@@ -351,11 +425,9 @@
 
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            // Arka plan
             ctx.fillStyle = isDark ? '#0b1329' : '#f1f5f9';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Gürültü Noktaları (Noise)
             for (let i = 0; i < 45; i++) {
                 ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.15)';
                 ctx.beginPath();
@@ -363,7 +435,6 @@
                 ctx.fill();
             }
 
-            // Kavisli Çizgi Engelleri (Bezier Curves)
             for (let i = 0; i < 4; i++) {
                 ctx.strokeStyle = isDark ? 'rgba(37, 99, 235, 0.6)' : 'rgba(37, 99, 235, 0.4)';
                 ctx.lineWidth = Math.random() * 1.5 + 1;
@@ -377,7 +448,6 @@
                 ctx.stroke();
             }
 
-            // Karmaşık Metin Çizimi
             ctx.font = 'bold 21px monospace';
             const charSpacing = (canvas.width - 24) / length;
 
@@ -387,9 +457,8 @@
                 const y = 30 + (Math.random() * 8 - 4);
                 
                 ctx.translate(x, y);
-                ctx.rotate((Math.random() - 0.5) * 0.45); // Rastgele açı
+                ctx.rotate((Math.random() - 0.5) * 0.45);
                 
-                // Karakter renk varyasyonu
                 const shade = isDark ? Math.floor(200 + Math.random() * 55) : Math.floor(20 + Math.random() * 60);
                 ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
                 
