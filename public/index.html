@@ -43,7 +43,6 @@
             --link-box-bg: #f8fafc;
             --link-box-border: #2563eb;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-            --select-arrow-color: %2364748b;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -63,7 +62,6 @@
                 --link-box-bg: #0b1329;
                 --link-box-border: #2563eb;
                 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-                --select-arrow-color: %2394a3b8;
             }
         }
 
@@ -163,7 +161,6 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* Özel Seçim Kutusu (Select) Tasarımı */
         select {
             width: 100%;
             padding: 12px 14px;
@@ -531,16 +528,11 @@
         let discoverPollInterval = null;
         let cachedFiles = [];
 
-        // Varsayılan eski dosyaları hazırlar
+        // Eski test/bot dosyalarını hafızadan temizler
         function initStorage() {
-            if (!localStorage.getItem('dosyap_files')) {
-                const initialFiles = [
-                    { id: '101', title: 'Proje Tasarım Belgesi', description: 'Uygulama arayüz tasarımları ve teknik gereksinimler.', originalName: 'tasarim.pdf', size: 2450000, createdAt: new Date(Date.now() - 86400000).toISOString() },
-                    { id: '102', title: 'Kaynak Kodları', description: 'Geliştirilen uygulamanın kaynak dosyaları.', originalName: 'kaynak.zip', size: 14200000, createdAt: new Date(Date.now() - 172800000).toISOString() },
-                    { id: '103', title: 'Kullanım Kılavuzu', description: 'Detaylı kurulum ve kullanma direktifleri.', originalName: 'kilavuz.docx', size: 512000, createdAt: new Date(Date.now() - 259200000).toISOString() }
-                ];
-                localStorage.setItem('dosyap_files', JSON.stringify(initialFiles));
-            }
+            let files = getLocalFiles();
+            files = files.filter(f => !['101', '102', '103'].includes(f.id));
+            localStorage.setItem('dosyap_files', JSON.stringify(files));
         }
 
         function getLocalFiles() {
@@ -704,9 +696,7 @@
                         files = [...apiFiles, ...files.filter(f => !ids.has(f.id))];
                     }
                 }
-            } catch (err) {
-                // Sunucu yoksa veya hata verirse yerel dosyalarla devam eder
-            }
+            } catch (err) {}
 
             cachedFiles = files;
             renderDiscoverList();
@@ -809,7 +799,6 @@
                     localFileRecord.id = data.id || newId;
                 }
             } catch (err) {
-                // Arka plan sunucusu yoksa bile nesne saklanır
             } finally {
                 saveLocalFile(localFileRecord);
                 const fullLink = `${window.location.origin}/dosya/${localFileRecord.id}`;
