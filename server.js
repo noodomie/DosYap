@@ -142,5 +142,5 @@ app.get('/dosya/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`DosYap sunucusu ${PORT} portunda çalışıyor.`);
+    console.log(`Sunucu çalışıyor.`);
 });
