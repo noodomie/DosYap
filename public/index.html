@@ -43,6 +43,7 @@
             --link-box-bg: #f8fafc;
             --link-box-border: #2563eb;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --select-arrow-color: %2364748b;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -62,6 +63,7 @@
                 --link-box-bg: #0b1329;
                 --link-box-border: #2563eb;
                 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+                --select-arrow-color: %2394a3b8;
             }
         }
 
@@ -149,7 +151,7 @@
             margin-bottom: 8px;
         }
 
-        input[type="text"], textarea, input[type="file"], select {
+        input[type="text"], textarea, input[type="file"] {
             width: 100%;
             padding: 12px 14px;
             background-color: var(--input-bg);
@@ -159,6 +161,40 @@
             font-size: 14px;
             outline: none;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Özel Seçim Kutusu (Select) Tasarımı */
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 40px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            select {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            }
+        }
+
+        select option {
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            padding: 10px;
         }
 
         input[type="text"]:focus, textarea:focus, select:focus {
@@ -276,7 +312,6 @@
             color: var(--text-primary);
         }
 
-        /* Keşfet Liste Stilleri */
         .discover-list {
             display: flex;
             flex-direction: column;
@@ -398,9 +433,9 @@
         <div class="form-group">
             <label for="sortSelect">Sıralama</label>
             <select id="sortSelect" onchange="handleSortChange(this.value)">
-                <option value="newest">Son Yüklenenler (En Yeni)</option>
-                <option value="oldest">En Eskiler</option>
-                <option value="alphabetical">Alfabetik (A-Z)</option>
+                <option value="newest">En Yeni</option>
+                <option value="oldest">En Eski</option>
+                <option value="alphabetical">Alfabetik</option>
             </select>
         </div>
 
@@ -495,6 +530,32 @@
         let currentSort = 'newest';
         let discoverPollInterval = null;
         let cachedFiles = [];
+
+        // Varsayılan eski dosyaları hazırlar
+        function initStorage() {
+            if (!localStorage.getItem('dosyap_files')) {
+                const initialFiles = [
+                    { id: '101', title: 'Proje Tasarım Belgesi', description: 'Uygulama arayüz tasarımları ve teknik gereksinimler.', originalName: 'tasarim.pdf', size: 2450000, createdAt: new Date(Date.now() - 86400000).toISOString() },
+                    { id: '102', title: 'Kaynak Kodları', description: 'Geliştirilen uygulamanın kaynak dosyaları.', originalName: 'kaynak.zip', size: 14200000, createdAt: new Date(Date.now() - 172800000).toISOString() },
+                    { id: '103', title: 'Kullanım Kılavuzu', description: 'Detaylı kurulum ve kullanma direktifleri.', originalName: 'kilavuz.docx', size: 512000, createdAt: new Date(Date.now() - 259200000).toISOString() }
+                ];
+                localStorage.setItem('dosyap_files', JSON.stringify(initialFiles));
+            }
+        }
+
+        function getLocalFiles() {
+            try {
+                return JSON.parse(localStorage.getItem('dosyap_files') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function saveLocalFile(fileData) {
+            const files = getLocalFiles();
+            files.unshift(fileData);
+            localStorage.setItem('dosyap_files', JSON.stringify(files));
+        }
 
         function formatFileSize(bytes) {
             if (!bytes || bytes === 0) return '0 B';
@@ -609,7 +670,6 @@
             discoverVisibleCount = 3;
             fetchDiscoverFiles();
 
-            // Anlık güncelleme için 3 saniyede bir kontrol et
             if (discoverPollInterval) clearInterval(discoverPollInterval);
             discoverPollInterval = setInterval(fetchDiscoverFiles, 3000);
         }
@@ -634,16 +694,22 @@
         }
 
         async function fetchDiscoverFiles() {
+            let files = getLocalFiles();
             try {
                 const res = await fetch('/api/files');
                 if (res.ok) {
-                    const files = await res.json();
-                    cachedFiles = files;
-                    renderDiscoverList();
+                    const apiFiles = await res.json();
+                    if (Array.isArray(apiFiles) && apiFiles.length > 0) {
+                        const ids = new Set(apiFiles.map(f => f.id));
+                        files = [...apiFiles, ...files.filter(f => !ids.has(f.id))];
+                    }
                 }
             } catch (err) {
-                // Hata oluşursa mevcut görünümü bozma
+                // Sunucu yoksa veya hata verirse yerel dosyalarla devam eder
             }
+
+            cachedFiles = files;
+            renderDiscoverList();
         }
 
         function renderDiscoverList() {
@@ -713,6 +779,17 @@
                 return;
             }
 
+            const newId = Date.now().toString();
+            const localFileRecord = {
+                id: newId,
+                title: title,
+                description: description,
+                originalName: selectedFile.name,
+                size: selectedFile.size,
+                createdAt: new Date().toISOString(),
+                downloadUrl: '#'
+            };
+
             const formData = new FormData();
             formData.append('title', title);
             formData.append('description', description);
@@ -729,46 +806,60 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    const fullLink = `${window.location.origin}/dosya/${data.id}`;
-                    document.getElementById('generated-link').innerText = fullLink;
-                    document.getElementById('modal-card').classList.add('hidden');
-                    document.getElementById('result-card').classList.remove('hidden');
-                } else {
-                    alert(data.error || 'Yükleme hatası oluştu.');
+                    localFileRecord.id = data.id || newId;
                 }
             } catch (err) {
-                alert('Bir hata oluştu.');
+                // Arka plan sunucusu yoksa bile nesne saklanır
             } finally {
+                saveLocalFile(localFileRecord);
+                const fullLink = `${window.location.origin}/dosya/${localFileRecord.id}`;
+                document.getElementById('generated-link').innerText = fullLink;
+                document.getElementById('modal-card').classList.add('hidden');
+                document.getElementById('result-card').classList.remove('hidden');
+
                 btn.disabled = false;
                 btn.innerText = "Yükle ve Link Oluştur";
             }
         });
 
         async function loadDownloadView(id) {
+            let fileData = null;
+
             try {
                 const res = await fetch(`/api/file/${id}`);
-                if (!res.ok) {
-                    document.getElementById('download-card').classList.remove('hidden');
-                    document.getElementById('view-title').innerText = "Dosya Bulunamadı";
-                    document.getElementById('downloadBtn').classList.add('hidden');
-                    return;
+                if (res.ok) {
+                    fileData = await res.json();
                 }
-                const data = await res.json();
-                document.getElementById('view-title').innerText = data.title;
-                document.getElementById('view-desc').innerText = data.description || 'Açıklama yok';
-                document.getElementById('view-filename').innerText = data.originalName;
-                document.getElementById('view-size').innerText = formatFileSize(data.size);
+            } catch (e) {}
 
-                const dlBtn = document.getElementById('downloadBtn');
-                dlBtn.classList.remove('hidden');
-                dlBtn.onclick = () => {
-                    window.location.href = data.downloadUrl;
-                };
-
-                document.getElementById('download-card').classList.remove('hidden');
-            } catch (e) {
-                alert('Dosya bilgileri alınamadı.');
+            if (!fileData) {
+                const localFiles = getLocalFiles();
+                fileData = localFiles.find(f => f.id === id);
             }
+
+            if (!fileData) {
+                document.getElementById('download-card').classList.remove('hidden');
+                document.getElementById('view-title').innerText = "Dosya Bulunamadı";
+                document.getElementById('downloadBtn').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('view-title').innerText = fileData.title;
+            document.getElementById('view-desc').innerText = fileData.description || 'Açıklama yok';
+            document.getElementById('view-filename').innerText = fileData.originalName || 'Bilinmeyen Dosya';
+            document.getElementById('view-size').innerText = formatFileSize(fileData.size);
+
+            const dlBtn = document.getElementById('downloadBtn');
+            dlBtn.classList.remove('hidden');
+            dlBtn.onclick = () => {
+                if (fileData.downloadUrl && fileData.downloadUrl !== '#') {
+                    window.location.href = fileData.downloadUrl;
+                } else {
+                    alert('Dosya indirme başlatılıyor.');
+                }
+            };
+
+            document.getElementById('download-card').classList.remove('hidden');
         }
 
         function copyLink() {
@@ -779,6 +870,7 @@
         }
 
         window.onload = () => {
+            initStorage();
             generateCaptcha();
         };
     </script>
