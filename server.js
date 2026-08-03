@@ -9,7 +9,6 @@ const http = require('http');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Cloudinary Yapılandırması
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -19,13 +18,11 @@ cloudinary.config({
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 25 MB Dosya boyutu sınırı (25 * 1024 * 1024 Byte)
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 25 * 1024 * 1024 }
 });
 
-// Dosya Yükleme Endpoint'i
 app.post('/api/upload', (req, res) => {
     upload.single('file')(req, res, (err) => {
         if (err instanceof multer.MulterError) {
@@ -42,7 +39,6 @@ app.post('/api/upload', (req, res) => {
             return res.status(400).json({ error: 'Lütfen bir dosya seçin.' });
         }
 
-        // 8 karakterli benzersiz ID üretme
         const id = crypto.randomBytes(4).toString('hex');
         const publicId = `dosyap/${id}`;
 
@@ -69,7 +65,6 @@ app.post('/api/upload', (req, res) => {
     });
 });
 
-// Dosya Bilgisi Getirme Endpoint'i
 app.get('/api/file/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -99,7 +94,6 @@ app.get('/api/file/:id', async (req, res) => {
     }
 });
 
-// Orijinal İsim ve Uzantıyla Doğrudan İndirme Endpoint'i
 app.get('/download/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -116,7 +110,6 @@ app.get('/download/:id', async (req, res) => {
         const context = asset.context || {};
         const originalName = context.originalName || `dosya_${id}`;
 
-        // Header ile orijinal dosya adı ve uzantısını koruma
         const safeName = originalName.replace(/["\r\n]/g, '_').replace(/[^\x00-\x7F]/g, '_');
         const encodedName = encodeURIComponent(originalName);
 
@@ -144,8 +137,7 @@ app.get('/download/:id', async (req, res) => {
     }
 });
 
-// Arayüz Sayfası
-app.get('/f/:id', (req, res) => {
+app.get('/dosya/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
