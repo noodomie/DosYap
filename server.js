@@ -1,4 +1,3 @@
-cat << 'EOF' > server.js
 const express = require('express');
 const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
@@ -112,4 +111,3 @@ app.get('/f/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`DosYap sunucusu ${PORT} portunda çalışıyor.`);
 });
-EOF
