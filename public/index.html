@@ -21,18 +21,6 @@
             --link-box-bg: #f8fafc;
             --link-box-border: #2563eb;
             --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-
-            --status-safe-bg: #f0fdf4;
-            --status-safe-border: #bbf7d0;
-            --status-safe-text: #166534;
-
-            --status-warn-bg: #fffbeb;
-            --status-warn-border: #fde68a;
-            --status-warn-text: #92400e;
-
-            --status-danger-bg: #fef2f2;
-            --status-danger-border: #fecaca;
-            --status-danger-text: #991b1b;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -52,18 +40,6 @@
                 --link-box-bg: #0b1329;
                 --link-box-border: #2563eb;
                 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-
-                --status-safe-bg: #052e16;
-                --status-safe-border: #14532d;
-                --status-safe-text: #86efac;
-
-                --status-warn-bg: #451a03;
-                --status-warn-border: #78350f;
-                --status-warn-text: #fde68a;
-
-                --status-danger-bg: #450a0a;
-                --status-danger-border: #7f1d1d;
-                --status-danger-text: #fca5a5;
             }
         }
 
@@ -96,6 +72,7 @@
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
+        /* Yumuşak Geçiş Animasyonları */
         .card:not(.hidden) {
             animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
@@ -234,7 +211,7 @@
             border: 1px solid var(--card-border);
             border-radius: 8px;
             padding: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .file-info-item {
@@ -269,61 +246,6 @@
             25% { transform: translateX(-4px); }
             75% { transform: translateX(4px); }
         }
-
-        /* Analiz Bölümü Stilleri */
-        .analysis-box {
-            margin-top: 16px;
-            padding: 16px;
-            border-radius: 8px;
-            background-color: var(--input-bg);
-            border: 1px solid var(--card-border);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background-color: var(--card-border);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background-color: var(--btn-primary);
-            transition: width 0.3s ease;
-        }
-
-        .badge-status {
-            display: inline-block;
-            padding: 8px 14px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 14px;
-            text-align: center;
-            width: 100%;
-            margin-bottom: 14px;
-            border: 1px solid transparent;
-        }
-
-        .status-safe {
-            background-color: var(--status-safe-bg);
-            border-color: var(--status-safe-border);
-            color: var(--status-safe-text);
-        }
-
-        .status-warn {
-            background-color: var(--status-warn-bg);
-            border-color: var(--status-warn-border);
-            color: var(--status-warn-text);
-        }
-
-        .status-danger {
-            background-color: var(--status-danger-bg);
-            border-color: var(--status-danger-border);
-            color: var(--status-danger-text);
-        }
     </style>
 </head>
 <body>
@@ -349,18 +271,6 @@
         <div class="header-title">DosYap</div>
         <div class="header-desc">Ücretsiz dosya paylaşım platformu.</div>
         <button onclick="openModal()">Oluştur</button>
-        <button class="secondary" onclick="openLinkModal()">Link ile Aç</button>
-    </div>
-
-    <div id="link-modal-card" class="card hidden">
-        <div class="header-title">Link ile Dosya Aç</div>
-        <div class="header-desc">Görüntülemek istediğiniz uygulama veya dosya bağlantısını girin.</div>
-        <div class="form-group">
-            <label for="direct-url">Dosya Linki</label>
-            <input type="text" id="direct-url" placeholder="https://example.com/dosya.apk">
-        </div>
-        <button onclick="openFromLink()">Dosyayı Aç</button>
-        <button type="button" class="secondary" onclick="closeLinkModal()">İptal</button>
     </div>
 
     <div id="modal-card" class="card hidden">
@@ -409,48 +319,14 @@
                 <div class="file-info-value" id="view-size">-</div>
             </div>
         </div>
-        
         <button id="downloadBtn">İndir</button>
-        <button id="inspectBtn" class="secondary" onclick="startAnalysis()">İncele</button>
-
-        <div id="analysis-box" class="analysis-box hidden">
-            <div class="file-info-label" id="analysis-status-text">Derin güvenlik analizi başlatılıyor...</div>
-            <div class="progress-bar">
-                <div id="progress-fill" class="progress-fill"></div>
-            </div>
-
-            <div id="analysis-results" class="hidden">
-                <div id="status-badge" class="badge-status"></div>
-                <div class="file-info-item">
-                    <div class="file-info-label">Kod Bütünlüğü</div>
-                    <div class="file-info-value" id="res-integrity">-</div>
-                </div>
-                <div class="file-info-item">
-                    <div class="file-info-label">Zararlı Yazılım İmzası</div>
-                    <div class="file-info-value" id="res-signature">-</div>
-                </div>
-                <div class="file-info-item">
-                    <div class="file-info-label">Sezgisel Tespit (Heuristic)</div>
-                    <div class="file-info-value" id="res-heuristic">-</div>
-                </div>
-            </div>
-        </div>
-
-        <button class="secondary" onclick="resetToMain()" style="margin-top: 14px;">Ana Sayfa</button>
     </div>
 
     <script>
         let captchaCode = '';
-        let currentFileObj = {
-            title: '',
-            description: '',
-            originalName: '',
-            size: 0,
-            downloadUrl: '#'
-        };
 
         function formatFileSize(bytes) {
-            if (!bytes || bytes === 0) return 'Bilinmiyor';
+            if (!bytes || bytes === 0) return '0 B';
             if (bytes < 1024) {
                 return bytes + ' B';
             } else if (bytes < 1024 * 1024) {
@@ -475,9 +351,11 @@
 
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
+            // Arka plan
             ctx.fillStyle = isDark ? '#0b1329' : '#f1f5f9';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Gürültü Noktaları (Noise)
             for (let i = 0; i < 45; i++) {
                 ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.15)';
                 ctx.beginPath();
@@ -485,6 +363,7 @@
                 ctx.fill();
             }
 
+            // Kavisli Çizgi Engelleri (Bezier Curves)
             for (let i = 0; i < 4; i++) {
                 ctx.strokeStyle = isDark ? 'rgba(37, 99, 235, 0.6)' : 'rgba(37, 99, 235, 0.4)';
                 ctx.lineWidth = Math.random() * 1.5 + 1;
@@ -498,6 +377,7 @@
                 ctx.stroke();
             }
 
+            // Karmaşık Metin Çizimi
             ctx.font = 'bold 21px monospace';
             const charSpacing = (canvas.width - 24) / length;
 
@@ -507,8 +387,9 @@
                 const y = 30 + (Math.random() * 8 - 4);
                 
                 ctx.translate(x, y);
-                ctx.rotate((Math.random() - 0.5) * 0.45);
+                ctx.rotate((Math.random() - 0.5) * 0.45); // Rastgele açı
                 
+                // Karakter renk varyasyonu
                 const shade = isDark ? Math.floor(200 + Math.random() * 55) : Math.floor(20 + Math.random() * 60);
                 ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
                 
@@ -549,47 +430,10 @@
             document.getElementById('main-card').classList.remove('hidden');
         }
 
-        function openLinkModal() {
-            document.getElementById('main-card').classList.add('hidden');
-            document.getElementById('link-modal-card').classList.remove('hidden');
-        }
-
-        function closeLinkModal() {
-            document.getElementById('link-modal-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-        }
-
-        function openFromLink() {
-            const url = document.getElementById('direct-url').value.trim();
-            if (!url) {
-                alert('Lütfen geçerli bir dosya linki girin.');
-                return;
-            }
-
-            const fileName = url.substring(url.lastIndexOf('/') + 1) || 'Bilinmeyen Dosya';
-
-            currentFileObj = {
-                title: 'Harici Link Dosyası',
-                description: url,
-                originalName: fileName,
-                size: 0,
-                downloadUrl: url
-            };
-
-            renderDownloadView(currentFileObj);
-            document.getElementById('link-modal-card').classList.add('hidden');
-            document.getElementById('download-card').classList.remove('hidden');
-        }
-
         function resetToMain() {
             document.getElementById('result-card').classList.add('hidden');
-            document.getElementById('download-card').classList.add('hidden');
-            document.getElementById('link-modal-card').classList.add('hidden');
-            document.getElementById('modal-card').classList.add('hidden');
-            document.getElementById('analysis-box').classList.add('hidden');
             document.getElementById('main-card').classList.remove('hidden');
             document.getElementById('uploadForm').reset();
-            document.getElementById('direct-url').value = '';
         }
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -644,112 +488,23 @@
                     document.getElementById('download-card').classList.remove('hidden');
                     document.getElementById('view-title').innerText = "Dosya Bulunamadı";
                     document.getElementById('downloadBtn').classList.add('hidden');
-                    document.getElementById('inspectBtn').classList.add('hidden');
                     return;
                 }
                 const data = await res.json();
-                currentFileObj = {
-                    title: data.title,
-                    description: data.description || 'Açıklama yok',
-                    originalName: data.originalName,
-                    size: data.size,
-                    downloadUrl: data.downloadUrl
+                document.getElementById('view-title').innerText = data.title;
+                document.getElementById('view-desc').innerText = data.description || 'Açıklama yok';
+                document.getElementById('view-filename').innerText = data.originalName;
+                document.getElementById('view-size').innerText = formatFileSize(data.size);
+
+                const dlBtn = document.getElementById('downloadBtn');
+                dlBtn.onclick = () => {
+                    window.location.href = data.downloadUrl;
                 };
 
-                renderDownloadView(currentFileObj);
                 document.getElementById('download-card').classList.remove('hidden');
             } catch (e) {
                 alert('Dosya bilgileri alınamadı.');
             }
-        }
-
-        function renderDownloadView(data) {
-            document.getElementById('view-title').innerText = data.title;
-            document.getElementById('view-desc').innerText = data.description;
-            document.getElementById('view-filename').innerText = data.originalName;
-            document.getElementById('view-size').innerText = formatFileSize(data.size);
-
-            const dlBtn = document.getElementById('downloadBtn');
-            dlBtn.classList.remove('hidden');
-            dlBtn.onclick = () => {
-                window.location.href = data.downloadUrl;
-            };
-
-            document.getElementById('inspectBtn').classList.remove('hidden');
-            document.getElementById('analysis-box').classList.add('hidden');
-        }
-
-        function startAnalysis() {
-            const analysisBox = document.getElementById('analysis-box');
-            const statusText = document.getElementById('analysis-status-text');
-            const progressFill = document.getElementById('progress-fill');
-            const resultsDiv = document.getElementById('analysis-results');
-
-            analysisBox.classList.remove('hidden');
-            resultsDiv.classList.add('hidden');
-            progressFill.style.width = '0%';
-            statusText.innerText = 'Derin dosya analizi başlatılıyor...';
-
-            let progress = 0;
-            const steps = [
-                { p: 25, text: 'Dosya başlık yapısı ve imzaları taranıyor...' },
-                { p: 55, text: 'Zararlı kod ve veri kalıpları kontrol ediliyor...' },
-                { p: 85, text: 'Sezgisel (Heuristic) risk analizi yapılıyor...' },
-                { p: 100, text: 'Analiz tamamlandı.' }
-            ];
-
-            let stepIdx = 0;
-            const interval = setInterval(() => {
-                if (stepIdx < steps.length) {
-                    progress = steps[stepIdx].p;
-                    progressFill.style.width = progress + '%';
-                    statusText.innerText = steps[stepIdx].text;
-                    stepIdx++;
-                } else {
-                    clearInterval(interval);
-                    showAnalysisResults();
-                }
-            }, 600);
-        }
-
-        function showAnalysisResults() {
-            const resultsDiv = document.getElementById('analysis-results');
-            const badge = document.getElementById('status-badge');
-            const fileName = (currentFileObj.originalName || '').toLowerCase();
-
-            let status = 'safe'; // safe, warn, danger
-
-            if (fileName.includes('virus') || fileName.includes('trojan') || fileName.includes('malware') || fileName.endsWith('.bat') || fileName.endsWith('.vbs')) {
-                status = 'danger';
-            } else if (fileName.endsWith('.exe') || fileName.endsWith('.apk') || fileName.includes('crack') || fileName.includes('hack')) {
-                status = 'warn';
-            } else {
-                status = 'safe';
-            }
-
-            badge.className = 'badge-status';
-
-            if (status === 'safe') {
-                badge.classList.add('status-safe');
-                badge.innerText = 'Tespit: Güvenli';
-                document.getElementById('res-integrity').innerText = 'Doğrulandı (Sorunsuz)';
-                document.getElementById('res-signature').innerText = 'Zararlı kod tespit edilmedi';
-                document.getElementById('res-heuristic').innerText = 'Temiz (0/64 motor)';
-            } else if (status === 'warn') {
-                badge.classList.add('status-warn');
-                badge.innerText = 'Tespit: Şüpheli';
-                document.getElementById('res-integrity').innerText = 'Çalıştırılabilir Dosya Uyarısı';
-                document.getElementById('res-signature').innerText = 'Bilinmeyen veya İmzasız Geliştirici';
-                document.getElementById('res-heuristic').innerText = 'Düşük / Orta Risk Potansiyeli';
-            } else {
-                badge.classList.add('status-danger');
-                badge.innerText = 'Tespit: Virüs';
-                document.getElementById('res-integrity').innerText = 'Bozuk / Zararlı Kod İmzası';
-                document.getElementById('res-signature').innerText = 'Zararlı İçerik Algılandı!';
-                document.getElementById('res-heuristic').innerText = 'Yüksek Risk (Tehdit Bulundu)';
-            }
-
-            resultsDiv.classList.remove('hidden');
         }
 
         function copyLink() {
