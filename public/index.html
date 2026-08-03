@@ -222,7 +222,6 @@
 </head>
 <body>
 
-    <!-- Captcha Dogrulama Ekrani -->
     <div id="verify-card" class="card">
         <div class="header-title">Bot Doğrulaması</div>
         <div class="header-desc">Devam etmek için aşağıdaki güvenlik kodunu girin.</div>
@@ -240,14 +239,12 @@
         <button onclick="checkCaptcha()">Doğrula ve Giriş Yap</button>
     </div>
 
-    <!-- Ana Ekran -->
     <div id="main-card" class="card hidden">
         <div class="header-title">DosYap</div>
         <div class="header-desc">Hızlı, sade ve güvenli dosya paylaşım platformu.</div>
         <button onclick="openModal()">Yeni Dosya Oluştur</button>
     </div>
 
-    <!-- Oluşturma Menüsü -->
     <div id="modal-card" class="card hidden">
         <div class="header-title">Dosya Yükle</div>
         <div class="header-desc">Paylaşmak istediğiniz dosya detaylarını girin.</div>
@@ -269,7 +266,6 @@
         </form>
     </div>
 
-    <!-- Link Paylaşım Ekrani -->
     <div id="result-card" class="card hidden">
         <div class="header-title">Dosya Hazır</div>
         <div class="header-desc">Aşağıdaki benzersiz link ile dosyanızı paylaşabilirsiniz.</div>
@@ -278,7 +274,6 @@
         <button class="secondary" onclick="resetToMain()">Ana Sayfaya Dön</button>
     </div>
 
-    <!-- İndirme Ekrani -->
     <div id="download-card" class="card hidden">
         <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
         <div class="header-desc">Bu dosya DosYap üzerinden paylaşıldı.</div>
@@ -364,8 +359,8 @@
 
         function routeView() {
             const path = window.location.pathname;
-            if (path.startsWith('/f/')) {
-                const id = path.split('/f/')[1];
+            if (path.startsWith('/dosya/')) {
+                const id = path.split('/dosya/')[1];
                 loadDownloadView(id);
             } else {
                 document.getElementById('main-card').classList.remove('hidden');
@@ -418,7 +413,7 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    const fullLink = `${window.location.origin}/f/${data.id}`;
+                    const fullLink = `${window.location.origin}/dosya/${data.id}`;
                     document.getElementById('generated-link').innerText = fullLink;
                     document.getElementById('modal-card').classList.add('hidden');
                     document.getElementById('result-card').classList.remove('hidden');
