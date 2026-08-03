@@ -3,6 +3,8 @@ const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const crypto = require('crypto');
 const path = require('path');
+const https = require('https');
+const http = require('http');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,7 +42,7 @@ app.post('/api/upload', (req, res) => {
             return res.status(400).json({ error: 'Lütfen bir dosya seçin.' });
         }
 
-        // 8 karakterli kısa ve temiz ID üretme
+        // 8 karakterli benzersiz ID üretme
         const id = crypto.randomBytes(4).toString('hex');
         const publicId = `dosyap/${id}`;
 
@@ -89,7 +91,7 @@ app.get('/api/file/:id', async (req, res) => {
             description: context.description || 'Açıklama bulunmuyor.',
             originalName: context.originalName || 'dosya',
             size: asset.bytes,
-            downloadUrl: asset.secure_url
+            downloadUrl: `/download/${id}`
         });
     } catch (error) {
         console.error('Arama hatası:', error);
@@ -97,7 +99,7 @@ app.get('/api/file/:id', async (req, res) => {
     }
 });
 
-// Doğrudan İndirme Bağlantısı
+// Orijinal İsim ve Uzantıyla Doğrudan İndirme Endpoint'i
 app.get('/download/:id', async (req, res) => {
     const id = req.params.id;
     try {
@@ -111,8 +113,33 @@ app.get('/download/:id', async (req, res) => {
         }
 
         const asset = result.resources[0];
-        res.redirect(asset.secure_url);
+        const context = asset.context || {};
+        const originalName = context.originalName || `dosya_${id}`;
+
+        // Header ile orijinal dosya adı ve uzantısını koruma
+        const safeName = originalName.replace(/["\r\n]/g, '_').replace(/[^\x00-\x7F]/g, '_');
+        const encodedName = encodeURIComponent(originalName);
+
+        res.setHeader('Content-Disposition', `attachment; filename="${safeName}"; filename*=UTF-8''${encodedName}`);
+
+        function pipeStream(fileUrl) {
+            const client = fileUrl.startsWith('https') ? https : http;
+            client.get(fileUrl, (cloudRes) => {
+                if (cloudRes.statusCode >= 300 && cloudRes.statusCode < 400 && cloudRes.headers.location) {
+                    return pipeStream(cloudRes.headers.location);
+                }
+                res.setHeader('Content-Type', cloudRes.headers['content-type'] || 'application/octet-stream');
+                cloudRes.pipe(res);
+            }).on('error', (err) => {
+                console.error('İndirme akış hatası:', err);
+                if (!res.headersSent) res.status(500).send('İndirme hatası.');
+            });
+        }
+
+        pipeStream(asset.secure_url);
+
     } catch (error) {
+        console.error('İndirme hatası:', error);
         res.status(500).send('Sunucu hatası.');
     }
 });
