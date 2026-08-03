@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DosYap - Güvenli Dosya Paylaşımı</title>
+    <title>DosYap - Dosya Paylaşımı</title>
     <style>
         :root {
             --bg-color: #f8fafc;
@@ -236,13 +236,13 @@
             <div id="captcha-error" class="error-text hidden">Doğrulama kodu hatalı, tekrar deneyin.</div>
         </div>
         
-        <button onclick="checkCaptcha()">Doğrula ve Giriş Yap</button>
+        <button onclick="checkCaptcha()">Doğrula</button>
     </div>
 
     <div id="main-card" class="card hidden">
         <div class="header-title">DosYap</div>
         <div class="header-desc">Hızlı, sade ve güvenli dosya paylaşım platformu.</div>
-        <button onclick="openModal()">Yeni Dosya Oluştur</button>
+        <button onclick="openModal()">Oluştur</button>
     </div>
 
     <div id="modal-card" class="card hidden">
@@ -251,39 +251,39 @@
         <form id="uploadForm">
             <div class="form-group">
                 <label for="title">Başlık / İsim</label>
-                <input type="text" id="title" required placeholder="Örn: Proje Dosyaları">
+                <input type="text" id="title" required placeholder="">
             </div>
             <div class="form-group">
                 <label for="description">Açıklama</label>
-                <textarea id="description" placeholder="Dosya hakkında kısa bilgi yazın..."></textarea>
+                <textarea id="description" placeholder=""></textarea>
             </div>
             <div class="form-group">
-                <label for="file">Dosya Seçin (Maksimum 25 MB)</label>
+                <label for="file">Dosya Seçin</label>
                 <input type="file" id="file" required>
             </div>
-            <button type="submit" id="uploadBtn">Yükle ve Link Oluştur</button>
+            <button type="submit" id="uploadBtn">Yükle</button>
             <button type="button" class="secondary" onclick="closeModal()">İptal</button>
         </form>
     </div>
 
     <div id="result-card" class="card hidden">
         <div class="header-title">Dosya Hazır</div>
-        <div class="header-desc">Aşağıdaki benzersiz link ile dosyanızı paylaşabilirsiniz.</div>
+        <div class="header-desc">Aşağıdaki link ile dosyanızı paylaşabilirsiniz.</div>
         <div class="link-box" id="generated-link"></div>
-        <button onclick="copyLink()">Linki Kopyala</button>
-        <button class="secondary" onclick="resetToMain()">Ana Sayfaya Dön</button>
+        <button onclick="copyLink()">Kopyala</button>
+        <button class="secondary" onclick="resetToMain()">Ana Sayfa</button>
     </div>
 
     <div id="download-card" class="card hidden">
         <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
-        <div class="header-desc">Bu dosya DosYap üzerinden paylaşıldı.</div>
+        <div class="header-desc">Bir DosYap dosyası.</div>
         <div class="file-info-list">
             <div class="file-info-item">
                 <div class="file-info-label">Açıklama</div>
                 <div class="file-info-value" id="view-desc">-</div>
             </div>
             <div class="file-info-item">
-                <div class="file-info-label">Orijinal Dosya Adı</div>
+                <div class="file-info-label">Dosya</div>
                 <div class="file-info-value" id="view-filename">-</div>
             </div>
             <div class="file-info-item">
@@ -291,7 +291,7 @@
                 <div class="file-info-value" id="view-size">-</div>
             </div>
         </div>
-        <button id="downloadBtn">Dosyayı İndir</button>
+        <button id="downloadBtn">İndir</button>
     </div>
 
     <script>
