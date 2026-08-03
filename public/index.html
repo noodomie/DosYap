@@ -72,6 +72,22 @@
             transition: background-color 0.3s ease, border-color 0.3s ease;
         }
 
+        /* Yumuşak Geçiş Animasyonları */
+        .card:not(.hidden) {
+            animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .header-title {
             font-size: 22px;
             font-weight: 700;
@@ -108,11 +124,12 @@
             color: var(--text-primary);
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
         input[type="text"]:focus, textarea:focus {
             border-color: var(--btn-primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         textarea {
@@ -130,11 +147,15 @@
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.1s ease;
         }
 
         button:hover {
             background-color: var(--btn-primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.99);
         }
 
         button.secondary {
@@ -166,8 +187,8 @@
 
         .refresh-btn {
             width: auto;
-            padding: 8px 12px;
-            font-size: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
             background-color: var(--btn-secondary);
             color: var(--btn-secondary-text);
         }
@@ -217,6 +238,13 @@
             color: #ef4444;
             font-size: 13px;
             margin-top: 8px;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
         }
     </style>
 </head>
@@ -229,7 +257,7 @@
         <div class="form-group">
             <label>Güvenlik Kodu</label>
             <div class="captcha-container">
-                <canvas id="captchaCanvas" width="160" height="46"></canvas>
+                <canvas id="captchaCanvas" width="180" height="48"></canvas>
                 <button type="button" class="refresh-btn" onclick="generateCaptcha()">Yenile</button>
             </div>
             <input type="text" id="captcha-answer" placeholder="" autocomplete="off">
@@ -241,7 +269,7 @@
 
     <div id="main-card" class="card hidden">
         <div class="header-title">DosYap</div>
-        <div class="header-desc">Hızlı, sade ve güvenli dosya paylaşım platformu.</div>
+        <div class="header-desc">Ücretsiz dosya paylaşım platformu.</div>
         <button onclick="openModal()">Oluştur</button>
     </div>
 
@@ -315,33 +343,58 @@
 
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             captchaCode = '';
-            for (let i = 0; i < 5; i++) {
+            const length = 6;
+
+            for (let i = 0; i < length; i++) {
                 captchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
             }
 
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
+            // Arka plan
             ctx.fillStyle = isDark ? '#0b1329' : '#f1f5f9';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.font = 'bold 22px monospace';
-            ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+            // Gürültü Noktaları (Noise)
+            for (let i = 0; i < 45; i++) {
+                ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.15)';
+                ctx.beginPath();
+                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Kavisli Çizgi Engelleri (Bezier Curves)
+            for (let i = 0; i < 4; i++) {
+                ctx.strokeStyle = isDark ? 'rgba(37, 99, 235, 0.6)' : 'rgba(37, 99, 235, 0.4)';
+                ctx.lineWidth = Math.random() * 1.5 + 1;
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                ctx.bezierCurveTo(
+                    Math.random() * canvas.width, Math.random() * canvas.height,
+                    Math.random() * canvas.width, Math.random() * canvas.height,
+                    Math.random() * canvas.width, Math.random() * canvas.height
+                );
+                ctx.stroke();
+            }
+
+            // Karmaşık Metin Çizimi
+            ctx.font = 'bold 21px monospace';
+            const charSpacing = (canvas.width - 24) / length;
 
             for (let i = 0; i < captchaCode.length; i++) {
                 ctx.save();
-                ctx.translate(20 + i * 26, 30);
-                ctx.rotate((Math.random() - 0.5) * 0.3);
+                const x = 14 + i * charSpacing + (Math.random() * 4 - 2);
+                const y = 30 + (Math.random() * 8 - 4);
+                
+                ctx.translate(x, y);
+                ctx.rotate((Math.random() - 0.5) * 0.45); // Rastgele açı
+                
+                // Karakter renk varyasyonu
+                const shade = isDark ? Math.floor(200 + Math.random() * 55) : Math.floor(20 + Math.random() * 60);
+                ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+                
                 ctx.fillText(captchaCode[i], 0, 0);
                 ctx.restore();
-            }
-
-            ctx.strokeStyle = '#2563eb';
-            ctx.lineWidth = 1;
-            for (let i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
-                ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
-                ctx.stroke();
             }
         }
 
