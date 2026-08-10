@@ -11,7 +11,6 @@
     <meta property="og:title" content="DosYap - Dosya Paylaşım Platformu">
     <meta property="og:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
     
-    <!-- BURAYA GERÇEK PNG/JPG LOGO LİNKİNİZİ YAZIN -->
     <meta property="og:image" content="https://dosyap.onrender.com/logo.png">
     <meta property="og:image:secure_url" content="https://dosyap.onrender.com/logo.png">
     <meta property="og:image:type" content="image/png">
@@ -86,7 +85,6 @@
             overflow-y: auto;
         }
 
-        /* Uygulama İçi Instagram Tarzı Bildirim (Toast) */
         .toast {
             position: fixed;
             top: 16px;
@@ -150,7 +148,6 @@
             }
         }
 
-        /* Instagram Story Halka Efektli Logo */
         .logo-wrapper {
             display: flex;
             flex-direction: column;
@@ -209,17 +206,32 @@
             margin-bottom: 16px;
         }
 
+        .label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
         label {
             display: block;
             font-size: 12px;
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Kalın Kalıplı Kutular ve Mavi Odaklanma */
+        .limit-badge {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ed4956;
+            background-color: rgba(237, 73, 86, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            letter-spacing: 0.2px;
+        }
+
         input[type="text"], textarea, input[type="file"] {
             width: 100%;
             padding: 11px 12px;
@@ -243,7 +255,6 @@
             min-height: 80px;
         }
 
-        /* Instagram Gradient Primary Button */
         button {
             width: 100%;
             padding: 11px;
@@ -356,6 +367,18 @@
             animation: shake 0.3s ease;
         }
 
+        .notice-box {
+            background-color: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-align: center;
+        }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -365,7 +388,6 @@
 </head>
 <body>
 
-    <!-- Uygulama İçi Toast Bildirim Alanı -->
     <div id="toast" class="toast hidden"></div>
 
     <div id="verify-card" class="card">
@@ -385,7 +407,9 @@
         <div class="header-desc">Devam etmek için aşağıdaki güvenlik kodunu girin.</div>
         
         <div class="form-group">
-            <label>Güvenlik Kodu</label>
+            <div class="label-container">
+                <label>Güvenlik Kodu</label>
+            </div>
             <div class="captcha-container">
                 <canvas id="captchaCanvas" width="180" height="48"></canvas>
                 <button type="button" class="refresh-btn" onclick="generateCaptcha()">Yenile</button>
@@ -411,7 +435,7 @@
             </div>
             <div class="header-title">DosYap</div>
         </div>
-        <div class="header-desc">Ücretsiz dosya paylaşım platformu.</div>
+        <div class="header-desc">Hızlı ve güvenli dosya paylaşımı.</div>
         <button onclick="openModal()">Oluştur</button>
     </div>
 
@@ -432,16 +456,24 @@
         <div class="header-desc">Paylaşmak istediğiniz dosya detaylarını girin.</div>
         <form id="uploadForm">
             <div class="form-group">
-                <label for="title">Başlık</label>
+                <div class="label-container">
+                    <label for="title">Başlık</label>
+                </div>
                 <input type="text" id="title" required placeholder="">
             </div>
             <div class="form-group">
-                <label for="description">Açıklama</label>
+                <div class="label-container">
+                    <label for="description">Açıklama</label>
+                </div>
                 <textarea id="description" placeholder=""></textarea>
             </div>
             <div class="form-group">
-                <label for="file">Dosya Seçin</label>
+                <div class="label-container">
+                    <label for="file">Dosya Seçin</label>
+                    <span class="limit-badge">Maks. 10 MB</span>
+                </div>
                 <input type="file" id="file" required>
+                <div class="notice-box">Yüklenebilir maksimum dosya boyutu 10 MB'tır.</div>
             </div>
             <button type="submit" id="uploadBtn">Yükle</button>
             <button type="button" class="secondary" onclick="closeModal()">İptal</button>
@@ -504,7 +536,6 @@
         let captchaCode = '';
         let toastTimeout;
 
-        /* Uygulama İçi Bildirim Fonksiyonu */
         function showToast(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.innerText = message;
@@ -516,7 +547,6 @@
             }, 3000);
         }
 
-        /* Mobil Klavyede Girdi Kutusunu Görünür Alana Kaydırma */
         document.querySelectorAll('input, textarea').forEach(element => {
             element.addEventListener('focus', () => {
                 setTimeout(() => {
@@ -640,8 +670,9 @@
             if (fileInput.files.length === 0) return;
 
             const selectedFile = fileInput.files[0];
-            if (selectedFile.size > 25 * 1024 * 1024) {
-                showToast('Seçilen dosya 25 MB sınırını aşıyor.', 'error');
+            // 10 MB sınırı kontrolü (10 * 1024 * 1024 bytes)
+            if (selectedFile.size > 10 * 1024 * 1024) {
+                showToast('Seçilen dosya 10 MB sınırını aşıyor.', 'error');
                 return;
             }
 
