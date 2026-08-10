@@ -20,14 +20,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 25 * 1024 * 1024 }
+    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB sınırı
 });
 
 app.post('/api/upload', (req, res) => {
     upload.single('file')(req, res, (err) => {
         if (err instanceof multer.MulterError) {
             if (err.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ error: 'Dosya boyutu çok büyük. Maksimum 25 MB yükleyebilirsiniz.' });
+                return res.status(400).json({ error: 'Dosya boyutu çok büyük. Maksimum 10 MB yükleyebilirsiniz.' });
             }
             return res.status(400).json({ error: 'Yükleme sırasında bir hata oluştu.' });
         } else if (err) {
