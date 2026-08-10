@@ -44,6 +44,9 @@
             --link-box-bg: #fafafa;
             --link-box-border: #0095f6;
             --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --dropzone-border: #cccccc;
+            --dropzone-bg: #f8f9fa;
+            --dropzone-hover-bg: #f0f7ff;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -61,6 +64,9 @@
                 --link-box-bg: #121212;
                 --link-box-border: #0095f6;
                 --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                --dropzone-border: #363636;
+                --dropzone-bg: #181818;
+                --dropzone-hover-bg: #1c2533;
             }
         }
 
@@ -232,7 +238,7 @@
             letter-spacing: 0.2px;
         }
 
-        input[type="text"], textarea, input[type="file"] {
+        input[type="text"], textarea {
             width: 100%;
             padding: 11px 12px;
             background-color: var(--input-bg);
@@ -245,7 +251,7 @@
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        input[type="text"]:focus, textarea:focus, input[type="file"]:focus {
+        input[type="text"]:focus, textarea:focus {
             border: 2px solid var(--ig-blue);
             box-shadow: 0 0 0 2px rgba(0, 149, 246, 0.15);
         }
@@ -253,6 +259,65 @@
         textarea {
             resize: vertical;
             min-height: 80px;
+        }
+
+        /* Özel Dosya Yükleme Alanı */
+        .file-dropzone {
+            position: relative;
+            width: 100%;
+            padding: 20px 16px;
+            background-color: var(--dropzone-bg);
+            border: 2px dashed var(--dropzone-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .file-dropzone:hover, .file-dropzone.dragover {
+            border-color: var(--ig-blue);
+            background-color: var(--dropzone-hover-bg);
+        }
+
+        .file-dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .upload-icon {
+            width: 32px;
+            height: 32px;
+            stroke: var(--ig-blue);
+            margin-bottom: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .file-dropzone:hover .upload-icon {
+            transform: translateY(-2px);
+        }
+
+        .dropzone-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+            word-break: break-all;
+        }
+
+        .dropzone-subtext {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
 
         button {
@@ -367,18 +432,6 @@
             animation: shake 0.3s ease;
         }
 
-        .notice-box {
-            background-color: var(--input-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            margin-top: 6px;
-            text-align: center;
-        }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
@@ -469,11 +522,19 @@
             </div>
             <div class="form-group">
                 <div class="label-container">
-                    <label for="file">Dosya Seçin</label>
+                    <label>Dosya Seçin</label>
                     <span class="limit-badge">Maks. 10 MB</span>
                 </div>
-                <input type="file" id="file" required>
-                <div class="notice-box">Yüklenebilir maksimum dosya boyutu 10 MB'tır.</div>
+                <div class="file-dropzone" id="dropzone">
+                    <input type="file" id="file" required onchange="handleFileSelect(this)">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                    </svg>
+                    <div class="dropzone-title" id="dropzone-title">Dosya Seçin veya Sürükleyin</div>
+                    <div class="dropzone-subtext" id="dropzone-subtext">Tüm dosya türleri desteklenmektedir</div>
+                </div>
             </div>
             <button type="submit" id="uploadBtn">Yükle</button>
             <button type="button" class="secondary" onclick="closeModal()">İptal</button>
@@ -547,7 +608,7 @@
             }, 3000);
         }
 
-        document.querySelectorAll('input, textarea').forEach(element => {
+        document.querySelectorAll('input[type="text"], textarea').forEach(element => {
             element.addEventListener('focus', () => {
                 setTimeout(() => {
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -564,6 +625,46 @@
             } else {
                 return (bytes / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB';
             }
+        }
+
+        function handleFileSelect(input) {
+            const titleElem = document.getElementById('dropzone-title');
+            const subtextElem = document.getElementById('dropzone-subtext');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('Seçilen dosya 10 MB sınırını aşıyor.', 'error');
+                    input.value = '';
+                    titleElem.innerText = 'Dosya Seçin veya Sürükleyin';
+                    subtextElem.innerText = 'Tüm dosya türleri desteklenmektedir';
+                    return;
+                }
+                titleElem.innerText = file.name;
+                subtextElem.innerText = formatFileSize(file.size);
+            } else {
+                titleElem.innerText = 'Dosya Seçin veya Sürükleyin';
+                subtextElem.innerText = 'Tüm dosya türleri desteklenmektedir';
+            }
+        }
+
+        const dropzone = document.getElementById('dropzone');
+        if (dropzone) {
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
         }
 
         function generateCaptcha() {
@@ -653,12 +754,19 @@
         function closeModal() {
             document.getElementById('modal-card').classList.add('hidden');
             document.getElementById('main-card').classList.remove('hidden');
+            resetUploadForm();
         }
 
         function resetToMain() {
             document.getElementById('result-card').classList.add('hidden');
             document.getElementById('main-card').classList.remove('hidden');
+            resetUploadForm();
+        }
+
+        function resetUploadForm() {
             document.getElementById('uploadForm').reset();
+            document.getElementById('dropzone-title').innerText = 'Dosya Seçin veya Sürükleyin';
+            document.getElementById('dropzone-subtext').innerText = 'Tüm dosya türleri desteklenmektedir';
         }
 
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
@@ -670,7 +778,6 @@
             if (fileInput.files.length === 0) return;
 
             const selectedFile = fileInput.files[0];
-            // 10 MB sınırı kontrolü (10 * 1024 * 1024 bytes)
             if (selectedFile.size > 10 * 1024 * 1024) {
                 showToast('Seçilen dosya 10 MB sınırını aşıyor.', 'error');
                 return;
@@ -703,7 +810,7 @@
                 showToast('Bir hata oluştu.', 'error');
             } finally {
                 btn.disabled = false;
-                btn.innerText = "Yükle ve Link Oluştur";
+                btn.innerText = "Yükle";
             }
         });
 
