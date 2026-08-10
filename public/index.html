@@ -28,45 +28,59 @@
 
     <style>
         :root {
-            --bg-color: #fafafa;
+            --bg-color: #f0f4f9;
             --card-bg: #ffffff;
-            --card-border: #dbdbdb;
-            --text-primary: #262626;
-            --text-secondary: #737373;
-            --input-bg: #fafafa;
-            --input-border: #dbdbdb;
-            --ig-blue: #0095f6;
-            --ig-blue-hover: #1877f2;
-            --ig-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-            --btn-secondary-bg: #efefef;
-            --btn-secondary-hover: #e0e0e0;
-            --btn-secondary-text: #262626;
-            --link-box-bg: #fafafa;
-            --link-box-border: #0095f6;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --dropzone-border: #cccccc;
-            --dropzone-bg: #f8f9fa;
-            --dropzone-hover-bg: #f0f7ff;
+            --card-border: #dbe3f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --input-bg: #f8fafc;
+            --input-border: #cbd5e1;
+            
+            /* Mavi Tonları Paleti */
+            --blue-primary: #2563eb;
+            --blue-secondary: #1d4ed8;
+            --blue-dark: #1e3a8a;
+            --blue-accent: #3b82f6;
+            --blue-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+            
+            --btn-secondary-bg: #e2e8f0;
+            --btn-secondary-hover: #cbd5e1;
+            --btn-secondary-text: #1e293b;
+            --link-box-bg: #eff6ff;
+            --link-box-border: #3b82f6;
+            --shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+            
+            --dropzone-border: #93c5fd;
+            --dropzone-bg: #f0f7ff;
+            --dropzone-hover-bg: #e0f2fe;
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #000000;
-                --card-bg: #121212;
-                --card-border: #262626;
-                --text-primary: #f5f5f5;
-                --text-secondary: #a8a8a8;
-                --input-bg: #121212;
-                --input-border: #363636;
-                --btn-secondary-bg: #262626;
-                --btn-secondary-hover: #363636;
-                --btn-secondary-text: #f5f5f5;
-                --link-box-bg: #121212;
-                --link-box-border: #0095f6;
-                --shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-                --dropzone-border: #363636;
-                --dropzone-bg: #181818;
-                --dropzone-hover-bg: #1c2533;
+                --bg-color: #0b1120;
+                --card-bg: #152033;
+                --card-border: #1e2d4a;
+                --text-primary: #f8fafc;
+                --text-secondary: #94a3b8;
+                --input-bg: #0b1120;
+                --input-border: #233554;
+                
+                --blue-primary: #3b82f6;
+                --blue-secondary: #2563eb;
+                --blue-dark: #1d4ed8;
+                --blue-accent: #60a5fa;
+                --blue-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
+                
+                --btn-secondary-bg: #1e2d4a;
+                --btn-secondary-hover: #2a3f66;
+                --btn-secondary-text: #f8fafc;
+                --link-box-bg: #0d192e;
+                --link-box-border: #2563eb;
+                --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+                
+                --dropzone-border: #1d4ed8;
+                --dropzone-bg: #0d192e;
+                --dropzone-hover-bg: #132342;
             }
         }
 
@@ -112,13 +126,13 @@
         }
 
         .toast.toast-error {
-            border-color: #ed4956;
-            color: #ed4956;
+            border-color: #ef4444;
+            color: #ef4444;
         }
 
         .toast.toast-success {
-            border-color: #0095f6;
-            color: #0095f6;
+            border-color: var(--blue-primary);
+            color: var(--blue-primary);
         }
 
         .toast.hidden {
@@ -163,11 +177,11 @@
             text-align: center;
         }
 
-        .story-ring {
+        .brand-ring {
             width: 56px;
             height: 56px;
             padding: 3px;
-            background: var(--ig-gradient);
+            background: var(--blue-gradient);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -175,7 +189,7 @@
             margin-bottom: 12px;
         }
 
-        .story-inner {
+        .brand-inner {
             width: 100%;
             height: 100%;
             background-color: var(--card-bg);
@@ -188,7 +202,7 @@
         .brand-logo {
             width: 26px;
             height: 26px;
-            stroke: var(--text-primary);
+            stroke: var(--blue-primary);
         }
 
         .header-title {
@@ -231,8 +245,8 @@
         .limit-badge {
             font-size: 11px;
             font-weight: 800;
-            color: #ed4956;
-            background-color: rgba(237, 73, 86, 0.1);
+            color: var(--blue-primary);
+            background-color: rgba(37, 99, 235, 0.12);
             padding: 2px 8px;
             border-radius: 12px;
             letter-spacing: 0.2px;
@@ -252,8 +266,8 @@
         }
 
         input[type="text"]:focus, textarea:focus {
-            border: 2px solid var(--ig-blue);
-            box-shadow: 0 0 0 2px rgba(0, 149, 246, 0.15);
+            border: 2px solid var(--blue-primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
         }
 
         textarea {
@@ -261,7 +275,7 @@
             min-height: 80px;
         }
 
-        /* Özel Dosya Yükleme Alanı */
+        /* Özel Mavi Dosya Yükleme Alanı */
         .file-dropzone {
             position: relative;
             width: 100%;
@@ -279,7 +293,7 @@
         }
 
         .file-dropzone:hover, .file-dropzone.dragover {
-            border-color: var(--ig-blue);
+            border-color: var(--blue-accent);
             background-color: var(--dropzone-hover-bg);
         }
 
@@ -297,7 +311,7 @@
         .upload-icon {
             width: 32px;
             height: 32px;
-            stroke: var(--ig-blue);
+            stroke: var(--blue-primary);
             margin-bottom: 8px;
             transition: transform 0.2s ease;
         }
@@ -323,7 +337,7 @@
         button {
             width: 100%;
             padding: 11px;
-            background: var(--ig-gradient);
+            background: var(--blue-gradient);
             color: #ffffff;
             border: none;
             border-radius: 8px;
@@ -385,7 +399,7 @@
             padding: 12px;
             border-radius: 8px;
             word-break: break-all;
-            color: var(--ig-blue);
+            color: var(--blue-primary);
             font-family: monospace;
             font-weight: 700;
             font-size: 12px;
@@ -425,7 +439,7 @@
         }
 
         .error-text {
-            color: #ed4956;
+            color: #ef4444;
             font-size: 12px;
             font-weight: 700;
             margin-top: 6px;
@@ -445,8 +459,8 @@
 
     <div id="verify-card" class="card">
         <div class="logo-wrapper">
-            <div class="story-ring">
-                <div class="story-inner">
+            <div class="brand-ring">
+                <div class="brand-inner">
                     <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -476,8 +490,8 @@
 
     <div id="main-card" class="card hidden">
         <div class="logo-wrapper">
-            <div class="story-ring">
-                <div class="story-inner">
+            <div class="brand-ring">
+                <div class="brand-inner">
                     <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -494,8 +508,8 @@
 
     <div id="modal-card" class="card hidden">
         <div class="logo-wrapper">
-            <div class="story-ring">
-                <div class="story-inner">
+            <div class="brand-ring">
+                <div class="brand-inner">
                     <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -543,8 +557,8 @@
 
     <div id="result-card" class="card hidden">
         <div class="logo-wrapper">
-            <div class="story-ring">
-                <div class="story-inner">
+            <div class="brand-ring">
+                <div class="brand-inner">
                     <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -563,8 +577,8 @@
 
     <div id="download-card" class="card hidden">
         <div class="logo-wrapper">
-            <div class="story-ring">
-                <div class="story-inner">
+            <div class="brand-ring">
+                <div class="brand-inner">
                     <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
                         <polyline points="14 2 14 8 20 8"/>
@@ -682,18 +696,18 @@
 
             const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             
-            ctx.fillStyle = isDark ? '#121212' : '#fafafa';
+            ctx.fillStyle = isDark ? '#0b1120' : '#f8fafc';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             for (let i = 0; i < 45; i++) {
-                ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(38, 38, 38, 0.15)';
+                ctx.fillStyle = isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(37, 99, 235, 0.15)';
                 ctx.beginPath();
                 ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
                 ctx.fill();
             }
 
             for (let i = 0; i < 4; i++) {
-                ctx.strokeStyle = isDark ? 'rgba(0, 149, 246, 0.6)' : 'rgba(0, 149, 246, 0.4)';
+                ctx.strokeStyle = isDark ? 'rgba(96, 165, 250, 0.6)' : 'rgba(37, 99, 235, 0.4)';
                 ctx.lineWidth = Math.random() * 1.5 + 1;
                 ctx.beginPath();
                 ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
@@ -716,8 +730,8 @@
                 ctx.translate(x, y);
                 ctx.rotate((Math.random() - 0.5) * 0.45);
                 
-                const shade = isDark ? Math.floor(200 + Math.random() * 55) : Math.floor(20 + Math.random() * 60);
-                ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+                const shade = isDark ? Math.floor(190 + Math.random() * 65) : Math.floor(30 + Math.random() * 50);
+                ctx.fillStyle = `rgb(${shade}, ${shade + 10}, ${shade + 30})`;
                 
                 ctx.fillText(captchaCode[i], 0, 0);
                 ctx.restore();
