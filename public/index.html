@@ -29,40 +29,50 @@
 
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --card-border: #e2e8f0;
+            --bg-color: #0f172a;
+            --bg-radial: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 100%);
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-border: rgba(255, 255, 255, 0.6);
             --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --input-bg: #f1f5f9;
+            --text-secondary: #475569;
+            --input-bg: #f8fafc;
             --input-border: #cbd5e1;
-            --btn-primary: #2563eb;
-            --btn-primary-hover: #1d4ed8;
-            --btn-secondary: #f1f5f9;
+            --input-focus: #3b82f6;
+            --btn-primary-bg: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --btn-primary-hover: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --btn-primary-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4);
+            --btn-secondary-bg: #f1f5f9;
             --btn-secondary-hover: #e2e8f0;
             --btn-secondary-text: #0f172a;
             --link-box-bg: #f8fafc;
-            --link-box-border: #2563eb;
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --link-box-border: #3b82f6;
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+            --glow-1: rgba(59, 130, 246, 0.15);
+            --glow-2: rgba(147, 51, 234, 0.12);
         }
 
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #0b1329;
-                --card-bg: #152238;
-                --card-border: #233554;
+                --bg-color: #070c18;
+                --bg-radial: radial-gradient(circle at 50% 0%, #0f172a 0%, #070c18 100%);
+                --card-bg: rgba(15, 23, 42, 0.75);
+                --card-border: rgba(255, 255, 255, 0.08);
                 --text-primary: #f8fafc;
                 --text-secondary: #94a3b8;
-                --input-bg: #0b1329;
-                --input-border: #233554;
-                --btn-primary: #2563eb;
-                --btn-primary-hover: #1d4ed8;
-                --btn-secondary: #233554;
-                --btn-secondary-hover: #334155;
+                --input-bg: rgba(11, 19, 41, 0.6);
+                --input-border: rgba(255, 255, 255, 0.12);
+                --input-focus: #3b82f6;
+                --btn-primary-bg: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                --btn-primary-hover: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+                --btn-primary-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5);
+                --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+                --btn-secondary-hover: rgba(255, 255, 255, 0.12);
                 --btn-secondary-text: #f8fafc;
-                --link-box-bg: #0b1329;
-                --link-box-border: #2563eb;
-                --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+                --link-box-bg: rgba(7, 12, 24, 0.8);
+                --link-box-border: #3b82f6;
+                --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+                --glow-1: rgba(59, 130, 246, 0.25);
+                --glow-2: rgba(139, 92, 246, 0.2);
             }
         }
 
@@ -70,39 +80,71 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             background-color: var(--bg-color);
+            background-image: var(--bg-radial);
             color: var(--text-primary);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 24px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Background Glows */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-1 {
+            top: -10%;
+            left: 20%;
+            width: 500px;
+            height: 500px;
+            background: var(--glow-1);
+        }
+
+        .glow-2 {
+            bottom: -10%;
+            right: 20%;
+            width: 450px;
+            height: 450px;
+            background: var(--glow-2);
         }
 
         .card {
+            position: relative;
+            z-index: 1;
             background-color: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 28px;
+            border-radius: 20px;
+            padding: 36px;
             width: 100%;
             max-width: 440px;
             box-shadow: var(--shadow);
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .card:not(.hidden) {
-            animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: cardFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         @keyframes cardFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(12px) scale(0.98);
+                transform: translateY(20px) scale(0.96);
             }
             to {
                 opacity: 1;
@@ -113,33 +155,44 @@
         .logo-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon-bg {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .brand-logo {
-            width: 32px;
-            height: 32px;
-            stroke: var(--btn-primary);
-            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            stroke: #3b82f6;
         }
 
         .header-title {
             font-size: 22px;
             font-weight: 700;
             color: var(--text-primary);
-            letter-spacing: -0.5px;
+            letter-spacing: -0.02em;
         }
 
         .header-desc {
             color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.5;
+            margin-bottom: 28px;
+            line-height: 1.6;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         label {
@@ -148,59 +201,112 @@
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 8px;
+            letter-spacing: -0.01em;
         }
 
-        input[type="text"], textarea, input[type="file"] {
+        input[type="text"], textarea {
             width: 100%;
-            padding: 12px 14px;
+            padding: 12px 16px;
             background-color: var(--input-bg);
             border: 1px solid var(--input-border);
-            border-radius: 8px;
+            border-radius: 10px;
             color: var(--text-primary);
             font-size: 14px;
             outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         input[type="text"]:focus, textarea:focus {
-            border-color: var(--btn-primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+            background-color: var(--card-bg);
         }
 
         textarea {
             resize: vertical;
-            min-height: 90px;
+            min-height: 100px;
+        }
+
+        /* Modernized Custom File Input */
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--input-bg);
+            border: 1px dashed var(--input-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="file"]:hover {
+            border-color: var(--input-focus);
+            background-color: rgba(59, 130, 246, 0.04);
+        }
+
+        input[type="file"]::file-selector-button {
+            padding: 8px 14px;
+            margin-right: 12px;
+            border-radius: 7px;
+            border: none;
+            background: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: var(--btn-secondary-hover);
         }
 
         button {
             width: 100%;
-            padding: 12px;
-            background-color: var(--btn-primary);
+            padding: 13px 20px;
+            background: var(--btn-primary-bg);
             color: #ffffff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-weight: 600;
             font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: var(--btn-primary-shadow);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         button:hover {
-            background-color: var(--btn-primary-hover);
+            background: var(--btn-primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 25px -5px rgba(37, 99, 235, 0.5);
         }
 
         button:active {
-            transform: scale(0.99);
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 5px 10px -3px rgba(37, 99, 235, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         button.secondary {
-            background-color: var(--btn-secondary);
+            background: var(--btn-secondary-bg);
             color: var(--btn-secondary-text);
+            box-shadow: none;
             margin-top: 10px;
+            border: 1px solid var(--card-border);
         }
 
         button.secondary:hover {
-            background-color: var(--btn-secondary-hover);
+            background: var(--btn-secondary-hover);
+            box-shadow: none;
         }
 
         .hidden {
@@ -216,41 +322,57 @@
 
         canvas {
             border: 1px solid var(--input-border);
-            border-radius: 8px;
+            border-radius: 10px;
             background-color: var(--input-bg);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .refresh-btn {
             width: auto;
-            padding: 12px 16px;
+            padding: 12px 18px;
             font-size: 13px;
-            background-color: var(--btn-secondary);
+            background: var(--btn-secondary-bg);
             color: var(--btn-secondary-text);
+            box-shadow: none;
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-btn:hover {
+            background: var(--btn-secondary-hover);
+            box-shadow: none;
         }
 
         .link-box {
             background-color: var(--link-box-bg);
             border: 1px dashed var(--link-box-border);
-            padding: 14px;
-            border-radius: 8px;
+            padding: 16px;
+            border-radius: 10px;
             word-break: break-all;
-            color: var(--btn-primary);
-            font-family: monospace;
+            color: #3b82f6;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             font-size: 13px;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             text-align: center;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
+            user-select: all;
         }
 
         .file-info-list {
             background-color: var(--input-bg);
             border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 24px;
         }
 
         .file-info-item {
-            margin-bottom: 12px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
         .file-info-item:last-child {
@@ -258,9 +380,11 @@
         }
 
         .file-info-label {
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             color: var(--text-secondary);
-            margin-bottom: 2px;
         }
 
         .file-info-value {
@@ -270,29 +394,37 @@
         }
 
         .error-text {
-            color: #ef4444;
+            color: #f43f5e;
             font-size: 13px;
+            font-weight: 500;
             margin-top: 8px;
-            animation: shake 0.3s ease;
+            animation: shake 0.35s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
         }
 
         @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
     </style>
 </head>
 <body>
 
+    <!-- Arka Plan Parlamaları -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
     <div id="verify-card" class="card">
         <div class="logo-wrapper">
-            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M12 18v-6"/>
-                <path d="m9 15 3-3 3 3"/>
-            </svg>
+            <div class="logo-icon-bg">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3-3 3 3"/>
+                </svg>
+            </div>
             <div class="header-title">Bot Doğrulaması</div>
         </div>
         <div class="header-desc">Devam etmek için aşağıdaki güvenlik kodunu girin.</div>
@@ -303,7 +435,7 @@
                 <canvas id="captchaCanvas" width="180" height="48"></canvas>
                 <button type="button" class="refresh-btn" onclick="generateCaptcha()">Yenile</button>
             </div>
-            <input type="text" id="captcha-answer" placeholder="" autocomplete="off">
+            <input type="text" id="captcha-answer" placeholder="Kodu giriniz" autocomplete="off">
             <div id="captcha-error" class="error-text hidden">Doğrulama kodu hatalı, tekrar deneyin.</div>
         </div>
         
@@ -312,37 +444,41 @@
 
     <div id="main-card" class="card hidden">
         <div class="logo-wrapper">
-            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M12 18v-6"/>
-                <path d="m9 15 3-3 3 3"/>
-            </svg>
+            <div class="logo-icon-bg">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3-3 3 3"/>
+                </svg>
+            </div>
             <div class="header-title">DosYap</div>
         </div>
-        <div class="header-desc">Ücretsiz dosya paylaşım platformu.</div>
+        <div class="header-desc">Ücretsiz ve hızlı dosya paylaşım platformu.</div>
         <button onclick="openModal()">Oluştur</button>
     </div>
 
     <div id="modal-card" class="card hidden">
         <div class="logo-wrapper">
-            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M12 18v-6"/>
-                <path d="m9 15 3-3 3 3"/>
-            </svg>
+            <div class="logo-icon-bg">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3-3 3 3"/>
+                </svg>
+            </div>
             <div class="header-title">Dosya Yükle</div>
         </div>
         <div class="header-desc">Paylaşmak istediğiniz dosya detaylarını girin.</div>
         <form id="uploadForm">
             <div class="form-group">
                 <label for="title">Başlık</label>
-                <input type="text" id="title" required placeholder="">
+                <input type="text" id="title" required placeholder="Dosya başlığı girin">
             </div>
             <div class="form-group">
                 <label for="description">Açıklama</label>
-                <textarea id="description" placeholder=""></textarea>
+                <textarea id="description" placeholder="Açıklama ekleyin (isteğe bağlı)"></textarea>
             </div>
             <div class="form-group">
                 <label for="file">Dosya Seçin</label>
@@ -355,12 +491,14 @@
 
     <div id="result-card" class="card hidden">
         <div class="logo-wrapper">
-            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M12 18v-6"/>
-                <path d="m9 15 3-3 3 3"/>
-            </svg>
+            <div class="logo-icon-bg">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3-3 3 3"/>
+                </svg>
+            </div>
             <div class="header-title">Dosya Hazır</div>
         </div>
         <div class="header-desc">Aşağıdaki link ile dosyanızı paylaşabilirsiniz.</div>
@@ -371,12 +509,14 @@
 
     <div id="download-card" class="card hidden">
         <div class="logo-wrapper">
-            <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <path d="M12 18v-6"/>
-                <path d="m9 15 3-3 3 3"/>
-            </svg>
+            <div class="logo-icon-bg">
+                <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <path d="M12 18v-6"/>
+                    <path d="m9 15 3-3 3 3"/>
+                </svg>
+            </div>
             <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
         </div>
         <div class="header-desc">Bir DosYap dosyası.</div>
