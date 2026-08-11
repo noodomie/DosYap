@@ -3,249 +3,144 @@ const multer = require('multer');
 const { v2: cloudinary } = require('cloudinary');
 const crypto = require('crypto');
 const path = require('path');
-const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
-const rateLimit = require('express-rate-limit');
+const https = require('https');
+const http = require('http');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Cloudflare Turnstile Gizli Anahtarı (Secret Key)
-const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAAx_YOUR_SECRET_KEY';
-
-// Cloudinary Yapılandırması
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Veritabanı Kurulumu (SQLite)
-const db = new sqlite3.Database('./dosyap.db', (err) => {
-    if (err) console.error('Veritabanı hatası:', err.message);
-    else console.log('SQLite Veritabanı bağlandı.');
-});
-
-db.run(`
-    CREATE TABLE IF NOT EXISTS files (
-        id TEXT PRIMARY KEY,
-        user_token TEXT NOT NULL,
-        title TEXT,
-        description TEXT,
-        original_name TEXT,
-        size INTEGER,
-        cloudinary_public_id TEXT,
-        cloudinary_url TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-`);
-
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Yükleme dizini oluşturma (RAM yerine disk kullanarak bellek tasarrufu)
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir);
-}
-
-const upload = multer({
-    dest: uploadDir,
-    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB Sınırı
-});
-
-// Rate Limiter: 15 dakikada IP başına maks 10 yükleme
-const uploadLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 10,
-    message: { error: 'Çok fazla dosya yükleme isteği attınız. Lütfen 15 dakika sonra tekrar deneyin.' }
-});
-
-// Cloudflare Turnstile Doğrulama Fonksiyonu
-async function verifyTurnstile(token, ip) {
-    if (!token) return false;
-    try {
-        const formData = new URLSearchParams();
-        formData.append('secret', TURNSTILE_SECRET_KEY);
-        formData.append('response', token);
-        formData.append('remoteip', ip);
-
-        const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-            method: 'POST',
-            body: formData
-        });
-        const outcome = await res.json();
-        return outcome.success;
-    } catch (e) {
-        console.error('Turnstile hatası:', e);
-        return false;
-    }
-}
-
-// Statik Dosyaları Sunma
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API: Dosya Yükleme
-app.post('/api/upload', uploadLimiter, upload.single('file'), async (req, res) => {
-    const { title, description, userToken, turnstileToken } = req.body;
-    const clientIp = req.ip || req.headers['x-forwarded-for'];
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10 MB sınırı
+});
 
-    // 1. Turnstile Bot Doğrulaması
-    const isHuman = await verifyTurnstile(turnstileToken, clientIp);
-    if (!isHuman) {
-        if (req.file) fs.unlinkSync(req.file.path);
-        return res.status(400).json({ error: 'Bot doğrulaması başarısız oldu.' });
-    }
-
-    if (!userToken) {
-        if (req.file) fs.unlinkSync(req.file.path);
-        return res.status(400).json({ error: 'Kullanıcı kimliği eksik.' });
-    }
-
-    if (!req.file) {
-        return res.status(400).json({ error: 'Lütfen bir dosya seçin.' });
-    }
-
-    // 2. Kota Kontrolü (Kullanıcı başına maks 10 dosya)
-    db.get('SELECT COUNT(*) as count FROM files WHERE user_token = ?', [userToken], async (err, row) => {
-        if (err) {
-            fs.unlinkSync(req.file.path);
-            return res.status(500).json({ error: 'Veritabanı hatası.' });
+app.post('/api/upload', (req, res) => {
+    upload.single('file')(req, res, (err) => {
+        if (err instanceof multer.MulterError) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ error: 'Dosya boyutu çok büyük. Maksimum 10 MB yükleyebilirsiniz.' });
+            }
+            return res.status(400).json({ error: 'Yükleme sırasında bir hata oluştu.' });
+        } else if (err) {
+            return res.status(500).json({ error: 'Sunucu hatası oluştu.' });
         }
 
-        if (row.count >= 10) {
-            fs.unlinkSync(req.file.path);
-            return res.status(400).json({ error: '10 dosyalık yükleme kotanız doldu. Yeni dosya yüklemek için "Dosyalarım" bölümünden dosya silmelisiniz.' });
+        const { title, description } = req.body;
+        if (!req.file) {
+            return res.status(400).json({ error: 'Lütfen bir dosya seçin.' });
         }
 
         const id = crypto.randomBytes(4).toString('hex');
         const publicId = `dosyap/${id}`;
 
-        try {
-            // 3. Diskten Cloudinary'ye Yükleme (RAM tüketmez)
-            const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
                 public_id: publicId,
-                resource_type: 'auto'
-            });
-
-            // Geçici dosyayı sil
-            fs.unlinkSync(req.file.path);
-
-            // 4. Veritabanına Kaydetme
-            const stmt = db.prepare(`
-                INSERT INTO files (id, user_token, title, description, original_name, size, cloudinary_public_id, cloudinary_url)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            `);
-            stmt.run(
-                id,
-                userToken,
-                title || 'İsimsiz Dosya',
-                description || '',
-                req.file.originalname,
-                req.file.size,
-                uploadResult.public_id,
-                uploadResult.secure_url,
-                (err) => {
-                    if (err) {
-                        return res.status(500).json({ error: 'Veritabanına kayıt yapılamadı.' });
-                    }
-                    res.json({ success: true, id });
+                resource_type: 'auto',
+                context: {
+                    title: title || 'İsimsiz Dosya',
+                    description: description || 'Açıklama bulunmuyor.',
+                    originalName: req.file.originalname
                 }
-            );
-        } catch (uploadError) {
-            if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-            console.error('Cloudinary hatası:', uploadError);
-            res.status(500).json({ error: 'Yükleme sırasında hata oluştu.' });
-        }
-    });
-});
-
-// API: Kullanıcının Dosyalarını Getirme
-app.get('/api/my-files', (req, res) => {
-    const userToken = req.headers['x-user-token'];
-    if (!userToken) return res.status(400).json({ error: 'Geçersiz istek.' });
-
-    db.all('SELECT id, title, description, original_name, size, created_at FROM files WHERE user_token = ? ORDER BY created_at DESC', [userToken], (err, rows) => {
-        if (err) return res.status(500).json({ error: 'Veri çekilemedi.' });
-        res.json({ files: rows, total: rows.length, max: 10 });
-    });
-});
-
-// API: Dosya Silme
-app.delete('/api/file/:id', (req, res) => {
-    const userToken = req.headers['x-user-token'];
-    const id = req.params.id;
-
-    db.get('SELECT * FROM files WHERE id = ? AND user_token = ?', [id, userToken], async (err, row) => {
-        if (err || !row) return res.status(404).json({ error: 'Dosya bulunamadı veya silme yetkiniz yok.' });
-
-        try {
-            // Cloudinary'den Sil
-            await cloudinary.uploader.destroy(row.cloudinary_public_id);
-            // Veritabanından Sil
-            db.run('DELETE FROM files WHERE id = ?', [id], (dbErr) => {
-                if (dbErr) return res.status(500).json({ error: 'Silme hatası.' });
-                res.json({ success: true, message: 'Dosya başarıyla silindi.' });
-            });
-        } catch (e) {
-            res.status(500).json({ error: 'Cloudinary silme hatası.' });
-        }
-    });
-});
-
-// API: Dosya Detayı
-app.get('/api/file/:id', (req, res) => {
-    const id = req.params.id;
-    db.get('SELECT id, title, description, original_name, size, cloudinary_url FROM files WHERE id = ?', [id], (err, row) => {
-        if (err || !row) return res.status(404).json({ error: 'Dosya bulunamadı.' });
-        res.json({
-            id: row.id,
-            title: row.title,
-            description: row.description,
-            originalName: row.original_name,
-            size: row.size,
-            downloadUrl: `/download/${row.id}`,
-            fileUrl: row.cloudinary_url
-        });
-    });
-});
-
-// Doğrudan Yönlendirmeli İndirme (Bandwidth Trafik İsrafı Engellendi)
-app.get('/download/:id', (req, res) => {
-    const id = req.params.id;
-    db.get('SELECT cloudinary_url, original_name FROM files WHERE id = ?', [id], (err, row) => {
-        if (err || !row) return res.status(404).send('Dosya bulunamadı.');
-        
-        // Cloudinary attachment (doğrudan indirme) URL yönlendirmesi
-        const downloadUrl = row.cloudinary_url.replace('/upload/', `/upload/fl_attachment:${encodeURIComponent(row.original_name)}/`);
-        res.redirect(downloadUrl);
-    });
-});
-
-// Dinamik OpenGraph Meta Etiketli Sayfa Sunumu
-app.get('/dosya/:id', (req, res) => {
-    const id = req.params.id;
-    const indexPath = path.join(__dirname, 'public', 'index.html');
-
-    fs.readFile(indexPath, 'utf8', (err, htmlData) => {
-        if (err) return res.status(500).send('Sunucu hatası');
-
-        db.get('SELECT title, description FROM files WHERE id = ?', [id], (dbErr, row) => {
-            let finalHtml = htmlData;
-            if (row) {
-                finalHtml = finalHtml
-                    .replace(/<!--OG_TITLE-->/g, `${row.title} - DosYap`)
-                    .replace(/<!--OG_DESC-->/g, row.description || 'DosYap ile güvenle paylaşılan dosya.');
-            } else {
-                finalHtml = finalHtml
-                    .replace(/<!--OG_TITLE-->/g, 'Dosya Bulunamadı - DosYap')
-                    .replace(/<!--OG_DESC-->/g, 'Aradığınız dosya silinmiş veya mevcut değil.');
+            },
+            (error, result) => {
+                if (error) {
+                    console.error('Cloudinary hatası:', error);
+                    return res.status(500).json({ error: 'Yükleme sırasında hata oluştu.' });
+                }
+                res.json({ success: true, id });
             }
-            res.send(finalHtml);
-        });
+        );
+
+        uploadStream.end(req.file.buffer);
     });
+});
+
+app.get('/api/file/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const result = await cloudinary.search
+            .expression(`public_id:dosyap/${id}`)
+            .with_field('context')
+            .execute();
+
+        if (!result.resources || result.resources.length === 0) {
+            return res.status(404).json({ error: 'Dosya bulunamadı.' });
+        }
+
+        const asset = result.resources[0];
+        const context = asset.context || {};
+
+        res.json({
+            id: id,
+            title: context.title || 'İsimsiz Dosya',
+            description: context.description || 'Açıklama bulunmuyor.',
+            originalName: context.originalName || 'dosya',
+            size: asset.bytes,
+            downloadUrl: `/download/${id}`
+        });
+    } catch (error) {
+        console.error('Arama hatası:', error);
+        res.status(500).json({ error: 'Sunucu hatası oluştu.' });
+    }
+});
+
+app.get('/download/:id', async (req, res) => {
+    const id = req.params.id;
+    try {
+        const result = await cloudinary.search
+            .expression(`public_id:dosyap/${id}`)
+            .with_field('context')
+            .execute();
+
+        if (!result.resources || result.resources.length === 0) {
+            return res.status(404).send('Dosya bulunamadı.');
+        }
+
+        const asset = result.resources[0];
+        const context = asset.context || {};
+        const originalName = context.originalName || `dosya_${id}`;
+
+        const safeName = originalName.replace(/["\r\n]/g, '_').replace(/[^\x00-\x7F]/g, '_');
+        const encodedName = encodeURIComponent(originalName);
+
+        res.setHeader('Content-Disposition', `attachment; filename="${safeName}"; filename*=UTF-8''${encodedName}`);
+
+        function pipeStream(fileUrl) {
+            const client = fileUrl.startsWith('https') ? https : http;
+            client.get(fileUrl, (cloudRes) => {
+                if (cloudRes.statusCode >= 300 && cloudRes.statusCode < 400 && cloudRes.headers.location) {
+                    return pipeStream(cloudRes.headers.location);
+                }
+                res.setHeader('Content-Type', cloudRes.headers['content-type'] || 'application/octet-stream');
+                cloudRes.pipe(res);
+            }).on('error', (err) => {
+                console.error('İndirme akış hatası:', err);
+                if (!res.headersSent) res.status(500).send('İndirme hatası.');
+            });
+        }
+
+        pipeStream(asset.secure_url);
+
+    } catch (error) {
+        console.error('İndirme hatası:', error);
+        res.status(500).send('Sunucu hatası.');
+    }
+});
+
+app.get('/dosya/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
-    console.log(`Sunucu ${PORT} portunda aktif.`);
+    console.log(`Sunucu çalışıyor.`);
 });
