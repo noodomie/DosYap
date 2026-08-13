@@ -5,26 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DosYap - Hızlı ve Güvenli Dosya Paylaşımı</title>
 
-    <!-- Social Media Link Önizleme Etiketleri -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="DosYap">
     <meta property="og:title" content="DosYap - Dosya Paylaşım Platformu">
     <meta property="og:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
-    
     <meta property="og:image" content="https://dosyap.onrender.com/logo.png">
     <meta property="og:image:secure_url" content="https://dosyap.onrender.com/logo.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
-    <!-- Twitter Card Etiketleri -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="DosYap - Dosya Paylaşım Platformu">
     <meta name="twitter:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
     <meta name="twitter:image" content="https://dosyap.onrender.com/logo.png">
 
-    <!-- Tarayıcı Sekme İkonu (Favicon) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/><polyline points='14 2 14 8 20 8'/><path d='M12 18v-6'/><path d='m9 15 3-3 3 3'/></svg>">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root {
@@ -36,7 +34,6 @@
             --input-bg: #f8fafc;
             --input-border: #cbd5e1;
             
-            /* Mavi Tonları Paleti */
             --blue-primary: #2563eb;
             --blue-secondary: #1d4ed8;
             --blue-dark: #1e3a8a;
@@ -147,7 +144,7 @@
             border-radius: 16px;
             padding: 32px 24px;
             width: 100%;
-            max-width: 380px;
+            max-width: 400px;
             box-shadow: var(--shadow);
             margin: auto 0;
             transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -275,7 +272,6 @@
             min-height: 80px;
         }
 
-        /* Özel Mavi Dosya Yükleme Alanı */
         .file-dropzone {
             position: relative;
             width: 100%;
@@ -367,6 +363,11 @@
             background: var(--btn-secondary-hover);
         }
 
+        button.danger {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -378,10 +379,15 @@
             margin-bottom: 10px;
         }
 
-        canvas {
+        .captcha-box {
             border: 1.5px solid var(--input-border);
             border-radius: 8px;
             background-color: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 180px;
+            height: 48px;
         }
 
         .refresh-btn {
@@ -405,6 +411,23 @@
             font-size: 12px;
             margin-bottom: 18px;
             text-align: center;
+        }
+
+        .qr-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1.5px solid var(--card-border);
+            margin-bottom: 18px;
+        }
+
+        .qr-wrapper img, .qr-wrapper canvas {
+            display: block;
+            max-width: 160px;
+            max-height: 160px;
         }
 
         .file-info-list {
@@ -436,6 +459,46 @@
             font-size: 13px;
             font-weight: 700;
             color: var(--text-primary);
+        }
+
+        .my-file-card {
+            background-color: var(--input-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .my-file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .my-file-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .my-file-sub {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .my-file-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .my-file-actions button {
+            padding: 6px 10px;
+            font-size: 11px;
+            border-radius: 6px;
         }
 
         .error-text {
@@ -478,8 +541,8 @@
                 <label>Güvenlik Kodu</label>
             </div>
             <div class="captcha-container">
-                <canvas id="captchaCanvas" width="180" height="48"></canvas>
-                <button type="button" class="refresh-btn" onclick="generateCaptcha()">Yenile</button>
+                <div id="captchaBox" class="captcha-box"></div>
+                <button type="button" class="refresh-btn" onclick="fetchCaptcha()">Yenile</button>
             </div>
             <input type="text" id="captcha-answer" placeholder="" autocomplete="off">
             <div id="captcha-error" class="error-text hidden">Doğrulama kodu hatalı, tekrar deneyin.</div>
@@ -503,7 +566,27 @@
             <div class="header-title">DosYap</div>
         </div>
         <div class="header-desc">Hızlı ve güvenli dosya paylaşımı.</div>
-        <button onclick="openModal()">Oluştur</button>
+        <button onclick="openModal()">Dosya Yükle</button>
+        <button class="secondary" onclick="openMyFiles()">Dosyalarım (<span id="my-files-count">0</span>/3)</button>
+    </div>
+
+    <div id="my-files-card" class="card hidden">
+        <div class="logo-wrapper">
+            <div class="brand-ring">
+                <div class="brand-inner">
+                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M12 18v-6"/>
+                        <path d="m9 15 3-3 3 3"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="header-title">Dosyalarım</div>
+        </div>
+        <div class="header-desc">Yüklediğiniz dosyaları buradan yönetebilirsiniz.</div>
+        <div id="my-files-list"></div>
+        <button class="secondary" onclick="closeMyFiles()">Ana Sayfa</button>
     </div>
 
     <div id="modal-card" class="card hidden">
@@ -569,9 +652,13 @@
             </div>
             <div class="header-title">Dosya Hazır</div>
         </div>
-        <div class="header-desc">Aşağıdaki link ile dosyanızı paylaşabilirsiniz.</div>
+        <div class="header-desc">Aşağıdaki link ve QR Kod ile dosyanızı paylaşabilirsiniz.</div>
         <div class="link-box" id="generated-link"></div>
-        <button onclick="copyLink()">Kopyala</button>
+        <div class="qr-wrapper">
+            <div id="result-qrcode"></div>
+        </div>
+        <button onclick="copyLink()">Link Kopyala</button>
+        <button class="secondary" onclick="downloadResultQr()">QR Kodu İndir</button>
         <button class="secondary" onclick="resetToMain()">Ana Sayfa</button>
     </div>
 
@@ -607,8 +694,31 @@
         <button id="downloadBtn">İndir</button>
     </div>
 
+    <div id="qr-modal-card" class="card hidden">
+        <div class="logo-wrapper">
+            <div class="brand-ring">
+                <div class="brand-inner">
+                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <path d="M12 18v-6"/>
+                        <path d="m9 15 3-3 3 3"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="header-title" id="qr-modal-title">QR Kod</div>
+        </div>
+        <div class="qr-wrapper">
+            <div id="modal-qrcode"></div>
+        </div>
+        <button onclick="downloadModalQr()">QR Kodu İndir</button>
+        <button class="secondary" onclick="closeQrModal()">Kapat</button>
+    </div>
+
     <script>
-        let captchaCode = '';
+        let captchaToken = '';
+        let uploadSessionToken = '';
+        let currentQrFileId = '';
         let toastTimeout;
 
         function showToast(message, type = 'info') {
@@ -622,13 +732,35 @@
             }, 3000);
         }
 
-        document.querySelectorAll('input[type="text"], textarea').forEach(element => {
-            element.addEventListener('focus', () => {
-                setTimeout(() => {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            });
-        });
+        function getMyFiles() {
+            try {
+                return JSON.parse(localStorage.getItem('dosyap_my_files')) || [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function saveMyFiles(files) {
+            localStorage.setItem('dosyap_my_files', JSON.stringify(files));
+            updateMyFilesCount();
+        }
+
+        function addMyFile(fileData) {
+            const files = getMyFiles();
+            files.unshift(fileData);
+            saveMyFiles(files);
+        }
+
+        function removeMyFile(id) {
+            let files = getMyFiles();
+            files = files.filter(f => f.id !== id);
+            saveMyFiles(files);
+        }
+
+        function updateMyFilesCount() {
+            const files = getMyFiles();
+            document.getElementById('my-files-count').innerText = files.length;
+        }
 
         function formatFileSize(bytes) {
             if (!bytes || bytes === 0) return '0 B';
@@ -639,6 +771,145 @@
             } else {
                 return (bytes / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB';
             }
+        }
+
+        async function fetchCaptcha() {
+            try {
+                const res = await fetch('/api/captcha');
+                const data = await res.json();
+                captchaToken = data.captchaToken;
+                document.getElementById('captchaBox').innerHTML = data.svg;
+                document.getElementById('captcha-answer').value = '';
+                document.getElementById('captcha-error').classList.add('hidden');
+            } catch (e) {
+                showToast('Captcha alınamadı.', 'error');
+            }
+        }
+
+        async function checkCaptcha() {
+            const answer = document.getElementById('captcha-answer').value.trim();
+            if (!answer) return;
+
+            try {
+                const res = await fetch('/api/verify-captcha', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ captchaToken, answer })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    uploadSessionToken = data.uploadSessionToken;
+                    document.getElementById('verify-card').classList.add('hidden');
+                    routeView();
+                } else {
+                    document.getElementById('captcha-error').classList.remove('hidden');
+                    fetchCaptcha();
+                }
+            } catch (e) {
+                showToast('Doğrulama sırasında hata oluştu.', 'error');
+            }
+        }
+
+        function routeView() {
+            const path = window.location.pathname;
+            if (path.startsWith('/dosya/')) {
+                const id = path.split('/dosya/')[1];
+                loadDownloadView(id);
+            } else {
+                document.getElementById('main-card').classList.remove('hidden');
+            }
+        }
+
+        function openModal() {
+            const files = getMyFiles();
+            if (files.length >= 3) {
+                showToast('En fazla 3 dosya yükleyebilirsiniz. Lütfen birini silin.', 'error');
+                return;
+            }
+            document.getElementById('main-card').classList.add('hidden');
+            document.getElementById('modal-card').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-card').classList.add('hidden');
+            document.getElementById('main-card').classList.remove('hidden');
+            resetUploadForm();
+        }
+
+        function openMyFiles() {
+            renderMyFilesList();
+            document.getElementById('main-card').classList.add('hidden');
+            document.getElementById('my-files-card').classList.remove('hidden');
+        }
+
+        function closeMyFiles() {
+            document.getElementById('my-files-card').classList.add('hidden');
+            document.getElementById('main-card').classList.remove('hidden');
+        }
+
+        function renderMyFilesList() {
+            const files = getMyFiles();
+            const container = document.getElementById('my-files-list');
+            container.innerHTML = '';
+
+            if (files.length === 0) {
+                container.innerHTML = '<div style="text-align:center;font-size:13px;color:var(--text-secondary);padding:16px 0;">Henüz yüklenmiş bir dosyanız yok.</div>';
+                return;
+            }
+
+            files.forEach(file => {
+                const fileEl = document.createElement('div');
+                fileEl.className = 'my-file-card';
+                fileEl.innerHTML = `
+                    <div class="my-file-header">
+                        <div class="my-file-title">${escapeHtml(file.title)}</div>
+                    </div>
+                    <div class="my-file-sub">${escapeHtml(file.originalName)} • ${formatFileSize(file.size)}</div>
+                    <div class="my-file-actions">
+                        <button onclick="copyCustomLink('${file.link}')">Kopyala</button>
+                        <button class="secondary" onclick="openQrModal('${file.id}', '${file.link}', '${escapeHtml(file.title)}')">QR Kod</button>
+                        <button class="danger" onclick="deleteMyFile('${file.id}')">Sil</button>
+                    </div>
+                `;
+                container.appendChild(fileEl);
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        async function deleteMyFile(id) {
+            if (!confirm('Bu dosyayı silmek istediğinize emin misiniz?')) return;
+
+            try {
+                const res = await fetch(`/api/file/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) {
+                    removeMyFile(id);
+                    renderMyFilesList();
+                    showToast('Dosya başarıyla silindi.', 'success');
+                } else {
+                    showToast(data.error || 'Silme işlemi başarısız.', 'error');
+                }
+            } catch (e) {
+                showToast('Sunucu hatası oluştu.', 'error');
+            }
+        }
+
+        function resetToMain() {
+            document.getElementById('result-card').classList.add('hidden');
+            document.getElementById('main-card').classList.remove('hidden');
+            resetUploadForm();
+        }
+
+        function resetUploadForm() {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('dropzone-title').innerText = 'Dosya Seçin veya Sürükleyin';
+            document.getElementById('dropzone-subtext').innerText = 'Tüm dosya türleri desteklenmektedir';
         }
 
         function handleFileSelect(input) {
@@ -662,129 +933,14 @@
             }
         }
 
-        const dropzone = document.getElementById('dropzone');
-        if (dropzone) {
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropzone.classList.add('dragover');
-                }, false);
-            });
-
-            ['dragleave', 'drop'].forEach(eventName => {
-                dropzone.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    dropzone.classList.remove('dragover');
-                }, false);
-            });
-        }
-
-        function generateCaptcha() {
-            const canvas = document.getElementById('captchaCanvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            captchaCode = '';
-            const length = 6;
-
-            for (let i = 0; i < length; i++) {
-                captchaCode += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-
-            const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
-            ctx.fillStyle = isDark ? '#0b1120' : '#f8fafc';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            for (let i = 0; i < 45; i++) {
-                ctx.fillStyle = isDark ? 'rgba(59, 130, 246, 0.25)' : 'rgba(37, 99, 235, 0.15)';
-                ctx.beginPath();
-                ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            for (let i = 0; i < 4; i++) {
-                ctx.strokeStyle = isDark ? 'rgba(96, 165, 250, 0.6)' : 'rgba(37, 99, 235, 0.4)';
-                ctx.lineWidth = Math.random() * 1.5 + 1;
-                ctx.beginPath();
-                ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
-                ctx.bezierCurveTo(
-                    Math.random() * canvas.width, Math.random() * canvas.height,
-                    Math.random() * canvas.width, Math.random() * canvas.height,
-                    Math.random() * canvas.width, Math.random() * canvas.height
-                );
-                ctx.stroke();
-            }
-
-            ctx.font = 'bold 21px monospace';
-            const charSpacing = (canvas.width - 24) / length;
-
-            for (let i = 0; i < captchaCode.length; i++) {
-                ctx.save();
-                const x = 14 + i * charSpacing + (Math.random() * 4 - 2);
-                const y = 30 + (Math.random() * 8 - 4);
-                
-                ctx.translate(x, y);
-                ctx.rotate((Math.random() - 0.5) * 0.45);
-                
-                const shade = isDark ? Math.floor(190 + Math.random() * 65) : Math.floor(30 + Math.random() * 50);
-                ctx.fillStyle = `rgb(${shade}, ${shade + 10}, ${shade + 30})`;
-                
-                ctx.fillText(captchaCode[i], 0, 0);
-                ctx.restore();
-            }
-        }
-
-        function checkCaptcha() {
-            const input = document.getElementById('captcha-answer').value.trim().toUpperCase();
-            if (input === captchaCode) {
-                document.getElementById('verify-card').classList.add('hidden');
-                routeView();
-            } else {
-                document.getElementById('captcha-error').classList.remove('hidden');
-                generateCaptcha();
-                document.getElementById('captcha-answer').value = '';
-            }
-        }
-
-        function routeView() {
-            const path = window.location.pathname;
-            if (path.startsWith('/dosya/')) {
-                const id = path.split('/dosya/')[1];
-                loadDownloadView(id);
-            } else {
-                document.getElementById('main-card').classList.remove('hidden');
-            }
-        }
-
-        function openModal() {
-            document.getElementById('main-card').classList.add('hidden');
-            document.getElementById('modal-card').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-            resetUploadForm();
-        }
-
-        function resetToMain() {
-            document.getElementById('result-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-            resetUploadForm();
-        }
-
-        function resetUploadForm() {
-            document.getElementById('uploadForm').reset();
-            document.getElementById('dropzone-title').innerText = 'Dosya Seçin veya Sürükleyin';
-            document.getElementById('dropzone-subtext').innerText = 'Tüm dosya türleri desteklenmektedir';
-        }
-
         document.getElementById('uploadForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const files = getMyFiles();
+            if (files.length >= 3) {
+                showToast('En fazla 3 dosya yükleyebilirsiniz.', 'error');
+                return;
+            }
+
             const title = document.getElementById('title').value;
             const description = document.getElementById('description').value;
             const fileInput = document.getElementById('file');
@@ -809,16 +965,45 @@
             try {
                 const response = await fetch('/api/upload', {
                     method: 'POST',
+                    headers: {
+                        'x-upload-token': uploadSessionToken
+                    },
                     body: formData
                 });
                 const data = await response.json();
                 if (data.success) {
                     const fullLink = `${window.location.origin}/dosya/${data.id}`;
+                    
+                    addMyFile({
+                        id: data.id,
+                        title: data.title,
+                        originalName: data.originalName,
+                        size: data.size,
+                        link: fullLink
+                    });
+
                     document.getElementById('generated-link').innerText = fullLink;
+                    
+                    const qrContainer = document.getElementById('result-qrcode');
+                    qrContainer.innerHTML = '';
+                    new QRCode(qrContainer, {
+                        text: fullLink,
+                        width: 160,
+                        height: 160,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+
+                    currentQrFileId = data.id;
+
                     document.getElementById('modal-card').classList.add('hidden');
                     document.getElementById('result-card').classList.remove('hidden');
                 } else {
                     showToast(data.error || 'Yükleme hatası oluştu.', 'error');
+                    if (response.status === 403) {
+                        setTimeout(() => location.reload(), 1500);
+                    }
                 }
             } catch (err) {
                 showToast('Bir hata oluştu.', 'error');
@@ -856,13 +1041,73 @@
 
         function copyLink() {
             const linkText = document.getElementById('generated-link').innerText;
+            copyCustomLink(linkText);
+        }
+
+        function copyCustomLink(linkText) {
             navigator.clipboard.writeText(linkText).then(() => {
                 showToast('Link kopyalandı!', 'success');
             });
         }
 
+        function downloadQrFromContainer(containerId, filename) {
+            const container = document.getElementById(containerId);
+            const img = container.querySelector('img');
+            const canvas = container.querySelector('canvas');
+            let dataUrl = '';
+
+            if (canvas) {
+                dataUrl = canvas.toDataURL('image/png');
+            } else if (img) {
+                dataUrl = img.src;
+            }
+
+            if (!dataUrl) {
+                showToast('QR Kod indirilemedi.', 'error');
+                return;
+            }
+
+            const a = document.createElement('a');
+            a.href = dataUrl;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function downloadResultQr() {
+            downloadQrFromContainer('result-qrcode', `DosYap_QR_${currentQrFileId}.png`);
+        }
+
+        function openQrModal(id, link, title) {
+            currentQrFileId = id;
+            document.getElementById('qr-modal-title').innerText = title;
+            const container = document.getElementById('modal-qrcode');
+            container.innerHTML = '';
+            new QRCode(container, {
+                text: link,
+                width: 160,
+                height: 160,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            document.getElementById('my-files-card').classList.add('hidden');
+            document.getElementById('qr-modal-card').classList.remove('hidden');
+        }
+
+        function closeQrModal() {
+            document.getElementById('qr-modal-card').classList.add('hidden');
+            document.getElementById('my-files-card').classList.remove('hidden');
+        }
+
+        function downloadModalQr() {
+            downloadQrFromContainer('modal-qrcode', `DosYap_QR_${currentQrFileId}.png`);
+        }
+
         window.onload = () => {
-            generateCaptcha();
+            fetchCaptcha();
+            updateMyFilesCount();
         };
     </script>
 </body>
