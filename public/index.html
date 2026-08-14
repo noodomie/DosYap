@@ -1,1114 +1,519 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DosYap - Hızlı ve Güvenli Dosya Paylaşımı</title>
-
-    <meta property="og:type" content="website">
-    <meta property="og:site_name" content="DosYap">
-    <meta property="og:title" content="DosYap - Dosya Paylaşım Platformu">
-    <meta property="og:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
-    <meta property="og:image" content="https://dosyap.onrender.com/logo.png">
-    <meta property="og:image:secure_url" content="https://dosyap.onrender.com/logo.png">
-    <meta property="og:image:type" content="image/png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="DosYap - Dosya Paylaşım Platformu">
-    <meta name="twitter:description" content="DosYap ile dosyalarınızı anında yükleyin ve arkadaşlarınızla güvenle paylaşın.">
-    <meta name="twitter:image" content="https://dosyap.onrender.com/logo.png">
-
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232563eb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z'/><polyline points='14 2 14 8 20 8'/><path d='M12 18v-6'/><path d='m9 15 3-3 3 3'/></svg>">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <style>
-        :root {
-            --bg-color: #f0f4f9;
-            --card-bg: #ffffff;
-            --card-border: #dbe3f0;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --input-bg: #f8fafc;
-            --input-border: #cbd5e1;
-            
-            --blue-primary: #2563eb;
-            --blue-secondary: #1d4ed8;
-            --blue-dark: #1e3a8a;
-            --blue-accent: #3b82f6;
-            --blue-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
-            
-            --btn-secondary-bg: #e2e8f0;
-            --btn-secondary-hover: #cbd5e1;
-            --btn-secondary-text: #1e293b;
-            --link-box-bg: #eff6ff;
-            --link-box-border: #3b82f6;
-            --shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
-            
-            --dropzone-border: #93c5fd;
-            --dropzone-bg: #f0f7ff;
-            --dropzone-hover-bg: #e0f2fe;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0b1120;
-                --card-bg: #152033;
-                --card-border: #1e2d4a;
-                --text-primary: #f8fafc;
-                --text-secondary: #94a3b8;
-                --input-bg: #0b1120;
-                --input-border: #233554;
-                
-                --blue-primary: #3b82f6;
-                --blue-secondary: #2563eb;
-                --blue-dark: #1d4ed8;
-                --blue-accent: #60a5fa;
-                --blue-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #1d4ed8 100%);
-                
-                --btn-secondary-bg: #1e2d4a;
-                --btn-secondary-hover: #2a3f66;
-                --btn-secondary-text: #f8fafc;
-                --link-box-bg: #0d192e;
-                --link-box-border: #2563eb;
-                --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-                
-                --dropzone-border: #1d4ed8;
-                --dropzone-bg: #0d192e;
-                --dropzone-hover-bg: #132342;
-            }
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-primary);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            min-height: 100dvh;
-            padding: 16px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            overflow-y: auto;
-        }
-
-        .toast {
-            position: fixed;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%) translateY(0);
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            color: var(--text-primary);
-            padding: 12px 24px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            opacity: 1;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 90%;
-            text-align: center;
-        }
-
-        .toast.toast-error {
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-
-        .toast.toast-success {
-            border-color: var(--blue-primary);
-            color: var(--blue-primary);
-        }
-
-        .toast.hidden {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-30px);
-            pointer-events: none;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 32px 24px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: var(--shadow);
-            margin: auto 0;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
-        }
-
-        .card:not(.hidden) {
-            animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        @keyframes cardFadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(16px) scale(0.97);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .logo-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .brand-ring {
-            width: 56px;
-            height: 56px;
-            padding: 3px;
-            background: var(--blue-gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-        }
-
-        .brand-inner {
-            width: 100%;
-            height: 100%;
-            background-color: var(--card-bg);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .brand-logo {
-            width: 26px;
-            height: 26px;
-            stroke: var(--blue-primary);
-        }
-
-        .header-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.8px;
-            margin-bottom: 4px;
-        }
-
-        .header-desc {
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 24px;
-            line-height: 1.4;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .label-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .limit-badge {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--blue-primary);
-            background-color: rgba(37, 99, 235, 0.12);
-            padding: 2px 8px;
-            border-radius: 12px;
-            letter-spacing: 0.2px;
-        }
-
-        input[type="text"], textarea {
-            width: 100%;
-            padding: 11px 12px;
-            background-color: var(--input-bg);
-            border: 1.5px solid var(--input-border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 13px;
-            font-weight: 600;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        input[type="text"]:focus, textarea:focus {
-            border: 2px solid var(--blue-primary);
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .file-dropzone {
-            position: relative;
-            width: 100%;
-            padding: 20px 16px;
-            background-color: var(--dropzone-bg);
-            border: 2px dashed var(--dropzone-border);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .file-dropzone:hover, .file-dropzone.dragover {
-            border-color: var(--blue-accent);
-            background-color: var(--dropzone-hover-bg);
-        }
-
-        .file-dropzone input[type="file"] {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        .upload-icon {
-            width: 32px;
-            height: 32px;
-            stroke: var(--blue-primary);
-            margin-bottom: 8px;
-            transition: transform 0.2s ease;
-        }
-
-        .file-dropzone:hover .upload-icon {
-            transform: translateY(-2px);
-        }
-
-        .dropzone-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 2px;
-            word-break: break-all;
-        }
-
-        .dropzone-subtext {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        button {
-            width: 100%;
-            padding: 11px;
-            background: var(--blue-gradient);
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.2px;
-            cursor: pointer;
-            transition: opacity 0.2s ease, transform 0.1s ease;
-        }
-
-        button:hover {
-            opacity: 0.92;
-        }
-
-        button:active {
-            transform: scale(0.98);
-            opacity: 0.85;
-        }
-
-        button.secondary {
-            background: var(--btn-secondary-bg);
-            color: var(--btn-secondary-text);
-            margin-top: 8px;
-        }
-
-        button.secondary:hover {
-            background: var(--btn-secondary-hover);
-        }
-
-        button.danger {
-            background: #ef4444;
-            color: #ffffff;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .captcha-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .captcha-box {
-            border: 1.5px solid var(--input-border);
-            border-radius: 8px;
-            background-color: var(--input-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 180px;
-            height: 48px;
-        }
-
-        .refresh-btn {
-            width: auto;
-            padding: 11px 14px;
-            font-size: 12px;
-            font-weight: 700;
-            background: var(--btn-secondary-bg);
-            color: var(--btn-secondary-text);
-        }
-
-        .link-box {
-            background-color: var(--link-box-bg);
-            border: 1.5px dashed var(--link-box-border);
-            padding: 12px;
-            border-radius: 8px;
-            word-break: break-all;
-            color: var(--blue-primary);
-            font-family: monospace;
-            font-weight: 700;
-            font-size: 12px;
-            margin-bottom: 18px;
-            text-align: center;
-        }
-
-        .qr-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #ffffff;
-            padding: 16px;
-            border-radius: 12px;
-            border: 1.5px solid var(--card-border);
-            margin-bottom: 18px;
-        }
-
-        .qr-wrapper img, .qr-wrapper canvas {
-            display: block;
-            max-width: 160px;
-            max-height: 160px;
-        }
-
-        .file-info-list {
-            background-color: var(--input-bg);
-            border: 1.5px solid var(--card-border);
-            border-radius: 8px;
-            padding: 14px;
-            margin-bottom: 18px;
-        }
-
-        .file-info-item {
-            margin-bottom: 10px;
-        }
-
-        .file-info-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .file-info-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-bottom: 2px;
-        }
-
-        .file-info-value {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .my-file-card {
-            background-color: var(--input-bg);
-            border: 1.5px solid var(--card-border);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
-        }
-
-        .my-file-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 6px;
-        }
-
-        .my-file-title {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-
-        .my-file-sub {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .my-file-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .my-file-actions button {
-            padding: 6px 10px;
-            font-size: 11px;
-            border-radius: 6px;
-        }
-
-        .error-text {
-            color: #ef4444;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 6px;
-            animation: shake 0.3s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dosyap - Hızlı Dosya Paylaşımı</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .card {
+      background: #151f32;
+      border: 1px solid #1e293b;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 440px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .icon-header {
+      width: 64px;
+      height: 64px;
+      background: rgba(37, 99, 235, 0.15);
+      border: 2px solid #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: #3b82f6;
+    }
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .file-input-wrapper {
+      border: 2px dashed #334155;
+      border-radius: 14px;
+      padding: 30px 16px;
+      cursor: pointer;
+      background: rgba(30, 41, 59, 0.3);
+      transition: all 0.2s;
+    }
+    .file-input-wrapper:hover {
+      border-color: #3b82f6;
+      background: rgba(37, 99, 235, 0.05);
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .progress-container {
+      display: none;
+      margin-top: 20px;
+    }
+    .progress-bar-bg {
+      background: #1e293b;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, #3b82f6, #6366f1);
+      height: 100%;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .progress-text {
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    .file-link-box {
+      background: #0f172a;
+      border: 1px dashed #3b82f6;
+      border-radius: 10px;
+      padding: 12px;
+      word-break: break-all;
+      color: #60a5fa;
+      font-family: monospace;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .qr-container {
+      background: #ffffff;
+      padding: 16px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+    .qr-container img {
+      width: 180px;
+      height: 180px;
+      display: block;
+    }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s;
+    }
+    .btn:active {
+      opacity: 0.8;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+    }
+    .btn-purple {
+      background: linear-gradient(135deg, #7c3aed, #6d28d9);
+      color: #ffffff;
+    }
+    .btn-teal {
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #ffffff;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .file-card {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: left;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .file-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .file-icon {
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .file-info {
+      overflow: hidden;
+    }
+    .file-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: #f8fafc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .file-meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .card-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 8px 0;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #ffffff;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: 1px solid #3b82f6;
+      font-size: 13px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
-    <div id="toast" class="toast hidden"></div>
+  <div class="card">
+    <div id="viewUpload" class="view-section active">
+      <div class="icon-header">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+      </div>
+      <h2>Dosya Yükle</h2>
+      <p class="subtitle">Dosyanızı seçip hemen paylaşın.</p>
+      
+      <div class="file-input-wrapper" onclick="triggerFileSelect()">
+        <svg width="32" height="32" fill="none" stroke="#64748b" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom: 8px;"><path d="M12 4v16m8-8H4"></path></svg>
+        <p style="font-size: 14px; color: #94a3b8;">Cihazınızdan bir dosya seçin</p>
+      </div>
+      <input type="file" id="fileInput" onchange="uploadFile()">
 
-    <div id="verify-card" class="card">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title">Bot Doğrulaması</div>
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressBar"></div>
         </div>
-        <div class="header-desc">Devam etmek için aşağıdaki güvenlik kodunu girin.</div>
-        
-        <div class="form-group">
-            <div class="label-container">
-                <label>Güvenlik Kodu</label>
-            </div>
-            <div class="captcha-container">
-                <div id="captchaBox" class="captcha-box"></div>
-                <button type="button" class="refresh-btn" onclick="fetchCaptcha()">Yenile</button>
-            </div>
-            <input type="text" id="captcha-answer" placeholder="" autocomplete="off">
-            <div id="captcha-error" class="error-text hidden">Doğrulama kodu hatalı, tekrar deneyin.</div>
-        </div>
-        
-        <button onclick="checkCaptcha()">Doğrula</button>
+        <div class="progress-text" id="progressText">%0 yükleniyor...</div>
+      </div>
+
+      <div style="margin-top: 16px;">
+        <button class="btn btn-outline" onclick="showView('viewFiles')">Dosyalarım</button>
+      </div>
     </div>
 
-    <div id="main-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title">DosYap</div>
-        </div>
-        <div class="header-desc">Hızlı ve güvenli dosya paylaşımı.</div>
-        <button onclick="openModal()">Dosya Yükle</button>
-        <button class="secondary" onclick="openMyFiles()">Dosyalarım (<span id="my-files-count">0</span>/3)</button>
+    <div id="viewReady" class="view-section">
+      <div class="icon-header">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+      </div>
+      <h2>Dosya Hazır</h2>
+      <p class="subtitle">Aşağıdaki link ve QR kod ile dosyanızı paylaşabilirsiniz.</p>
+
+      <div class="file-link-box" id="readyLinkText"></div>
+
+      <div class="qr-container">
+        <img id="readyQrImg" src="" alt="QR Kod">
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="copyReadyLink()">Link Kopyala</button>
+        <button class="btn btn-purple" onclick="downloadQrCode()">QR Kodu İndir</button>
+        <button class="btn btn-teal" id="shareBtn" onclick="shareReadyLink()">Paylaş</button>
+        <button class="btn btn-outline" onclick="showView('viewUpload')">Ana Sayfa</button>
+      </div>
     </div>
 
-    <div id="my-files-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title">Dosyalarım</div>
-        </div>
-        <div class="header-desc">Yüklediğiniz dosyaları buradan yönetebilirsiniz.</div>
-        <div id="my-files-list"></div>
-        <button class="secondary" onclick="closeMyFiles()">Ana Sayfa</button>
+    <div id="viewFiles" class="view-section">
+      <div class="icon-header">
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 002-2h-6l-2-2H5a2 2 0 00-2 2z"></path></svg>
+      </div>
+      <h2>Dosyalarım</h2>
+      <p class="subtitle">Yüklediğiniz dosyaları buradan yönetebilirsiniz.</p>
+
+      <div id="filesListContainer"></div>
+
+      <button class="btn btn-outline" onclick="showView('viewUpload')" style="margin-top: 12px;">Ana Sayfa</button>
     </div>
+  </div>
 
-    <div id="modal-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
+  <div id="toast" class="toast">İşlem Başarılı</div>
+
+  <script>
+    let currentUploadedFile = null;
+
+    function vibrate(ms = 40) {
+      if (navigator.vibrate) {
+        navigator.vibrate(ms);
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.innerText = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    }
+
+    function showView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+      document.getElementById(viewId).classList.add('active');
+      if (viewId === 'viewFiles') {
+        loadFilesList();
+      }
+    }
+
+    function triggerFileSelect() {
+      document.getElementById('fileInput').click();
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return '🖼️';
+      if (['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(ext)) return '🎥';
+      if (['mp3', 'wav', 'ogg', 'm4a', 'flac'].includes(ext)) return '🎵';
+      if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return '📦';
+      if (['pdf', 'doc', 'docx', 'txt', 'rtf'].includes(ext)) return '📄';
+      if (['js', 'html', 'css', 'json', 'py', 'cpp', 'java'].includes(ext)) return '💻';
+      if (['apk', 'exe', 'msi'].includes(ext)) return '⚙️';
+      return '📁';
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function uploadFile() {
+      const input = document.getElementById('fileInput');
+      if (!input.files.length) return;
+
+      const file = input.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
+
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      progressText.innerText = '%0 yükleniyor...';
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/upload', true);
+
+      xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+          const percent = Math.round((e.loaded / e.total) * 100);
+          progressBar.style.width = percent + '%';
+          progressText.innerText = '%' + percent + ' yükleniyor...';
+        }
+      };
+
+      xhr.onload = function() {
+        progressContainer.style.display = 'none';
+        input.value = '';
+        if (xhr.status === 200) {
+          const res = JSON.parse(xhr.responseText);
+          if (res.success) {
+            vibrate(60);
+            currentUploadedFile = res.file;
+            setupReadyView(res.file);
+            showView('viewReady');
+            showToast('Dosya başarıyla yüklendi!');
+          }
+        } else {
+          showToast('Yükleme hatası oluştu!');
+        }
+      };
+
+      xhr.onerror = function() {
+        progressContainer.style.display = 'none';
+        showToast('Bağlantı hatası!');
+      };
+
+      xhr.send(formData);
+    }
+
+    function setupReadyView(file) {
+      const shareUrl = window.location.origin + '/dosya/' + file.id;
+      document.getElementById('readyLinkText').innerText = shareUrl;
+      const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(shareUrl);
+      document.getElementById('readyQrImg').src = qrUrl;
+    }
+
+    function copyReadyLink() {
+      const text = document.getElementById('readyLinkText').innerText;
+      navigator.clipboard.writeText(text);
+      vibrate(30);
+      showToast('Link kopyalandı!');
+    }
+
+    function downloadQrCode() {
+      const img = document.getElementById('readyQrImg');
+      const a = document.createElement('a');
+      a.href = img.src;
+      a.download = 'qrcode.png';
+      a.target = '_blank';
+      a.click();
+      vibrate(30);
+    }
+
+    function shareReadyLink() {
+      const shareUrl = document.getElementById('readyLinkText').innerText;
+      if (navigator.share) {
+        navigator.share({
+          title: 'Dosya Paylaşımı',
+          text: 'Dosyap üzerinden paylaşılan dosya:',
+          url: shareUrl
+        }).catch(() => {});
+        vibrate(30);
+      } else {
+        copyReadyLink();
+      }
+    }
+
+    function loadFilesList() {
+      const container = document.getElementById('filesListContainer');
+      container.innerHTML = '<p style="color:#64748b; font-size:14px;">Yükleniyor...</p>';
+
+      fetch('/api/files')
+        .then(res => res.json())
+        .then(files => {
+          if (!files.length) {
+            container.innerHTML = '<p style="color:#64748b; font-size:14px;">Henüz yüklenmiş dosya yok.</p>';
+            return;
+          }
+          container.innerHTML = '';
+          files.forEach(file => {
+            const icon = getFileIcon(file.name);
+            const sizeStr = formatBytes(file.size);
+            const fileUrl = window.location.origin + '/dosya/' + file.id;
+
+            const card = document.createElement('div');
+            card.className = 'file-card';
+            card.id = 'file-card-' + file.id;
+            card.innerHTML = `
+              <a href="${fileUrl}" target="_blank" class="file-header">
+                <div class="file-icon">${icon}</div>
+                <div class="file-info">
+                  <div class="file-title">${file.name}</div>
+                  <div class="file-meta">${file.name} • ${sizeStr}</div>
                 </div>
-            </div>
-            <div class="header-title">Dosya Yükle</div>
-        </div>
-        <div class="header-desc">Paylaşmak istediğiniz dosya detaylarını girin.</div>
-        <form id="uploadForm">
-            <div class="form-group">
-                <div class="label-container">
-                    <label for="title">Başlık</label>
-                </div>
-                <input type="text" id="title" required placeholder="">
-            </div>
-            <div class="form-group">
-                <div class="label-container">
-                    <label for="description">Açıklama</label>
-                </div>
-                <textarea id="description" placeholder=""></textarea>
-            </div>
-            <div class="form-group">
-                <div class="label-container">
-                    <label>Dosya Seçin</label>
-                    <span class="limit-badge">Maks. 10 MB</span>
-                </div>
-                <div class="file-dropzone" id="dropzone">
-                    <input type="file" id="file" required onchange="handleFileSelect(this)">
-                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                    </svg>
-                    <div class="dropzone-title" id="dropzone-title">Dosya Seçin veya Sürükleyin</div>
-                    <div class="dropzone-subtext" id="dropzone-subtext">Tüm dosya türleri desteklenmektedir</div>
-                </div>
-            </div>
-            <button type="submit" id="uploadBtn">Yükle</button>
-            <button type="button" class="secondary" onclick="closeModal()">İptal</button>
-        </form>
-    </div>
-
-    <div id="result-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title">Dosya Hazır</div>
-        </div>
-        <div class="header-desc">Aşağıdaki link ve QR Kod ile dosyanızı paylaşabilirsiniz.</div>
-        <div class="link-box" id="generated-link"></div>
-        <div class="qr-wrapper">
-            <div id="result-qrcode"></div>
-        </div>
-        <button onclick="copyLink()">Link Kopyala</button>
-        <button class="secondary" onclick="downloadResultQr()">QR Kodu İndir</button>
-        <button class="secondary" onclick="resetToMain()">Ana Sayfa</button>
-    </div>
-
-    <div id="download-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title" id="view-title">Dosya Yükleniyor...</div>
-        </div>
-        <div class="header-desc">Bir DosYap dosyası.</div>
-        <div class="file-info-list">
-            <div class="file-info-item">
-                <div class="file-info-label">Açıklama</div>
-                <div class="file-info-value" id="view-desc">-</div>
-            </div>
-            <div class="file-info-item">
-                <div class="file-info-label">Dosya</div>
-                <div class="file-info-value" id="view-filename">-</div>
-            </div>
-            <div class="file-info-item">
-                <div class="file-info-label">Boyut</div>
-                <div class="file-info-value" id="view-size">-</div>
-            </div>
-        </div>
-        <button id="downloadBtn">İndir</button>
-    </div>
-
-    <div id="qr-modal-card" class="card hidden">
-        <div class="logo-wrapper">
-            <div class="brand-ring">
-                <div class="brand-inner">
-                    <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <path d="M12 18v-6"/>
-                        <path d="m9 15 3-3 3 3"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="header-title" id="qr-modal-title">QR Kod</div>
-        </div>
-        <div class="qr-wrapper">
-            <div id="modal-qrcode"></div>
-        </div>
-        <button onclick="downloadModalQr()">QR Kodu İndir</button>
-        <button class="secondary" onclick="closeQrModal()">Kapat</button>
-    </div>
-
-    <script>
-        let captchaToken = '';
-        let uploadSessionToken = '';
-        let currentQrFileId = '';
-        let toastTimeout;
-
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.innerText = message;
-            toast.className = `toast toast-${type}`;
-            clearTimeout(toastTimeout);
-            
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 3000);
-        }
-
-        function getMyFiles() {
-            try {
-                return JSON.parse(localStorage.getItem('dosyap_my_files')) || [];
-            } catch(e) {
-                return [];
-            }
-        }
-
-        function saveMyFiles(files) {
-            localStorage.setItem('dosyap_my_files', JSON.stringify(files));
-            updateMyFilesCount();
-        }
-
-        function addMyFile(fileData) {
-            const files = getMyFiles();
-            files.unshift(fileData);
-            saveMyFiles(files);
-        }
-
-        function removeMyFile(id) {
-            let files = getMyFiles();
-            files = files.filter(f => f.id !== id);
-            saveMyFiles(files);
-        }
-
-        function updateMyFilesCount() {
-            const files = getMyFiles();
-            document.getElementById('my-files-count').innerText = files.length;
-        }
-
-        function formatFileSize(bytes) {
-            if (!bytes || bytes === 0) return '0 B';
-            if (bytes < 1024) {
-                return bytes + ' B';
-            } else if (bytes < 1024 * 1024) {
-                return (bytes / 1024).toFixed(2).replace(/\.00$/, '') + ' KB';
-            } else {
-                return (bytes / (1024 * 1024)).toFixed(2).replace(/\.00$/, '') + ' MB';
-            }
-        }
-
-        async function fetchCaptcha() {
-            try {
-                const res = await fetch('/api/captcha');
-                const data = await res.json();
-                captchaToken = data.captchaToken;
-                document.getElementById('captchaBox').innerHTML = data.svg;
-                document.getElementById('captcha-answer').value = '';
-                document.getElementById('captcha-error').classList.add('hidden');
-            } catch (e) {
-                showToast('Captcha alınamadı.', 'error');
-            }
-        }
-
-        async function checkCaptcha() {
-            const answer = document.getElementById('captcha-answer').value.trim();
-            if (!answer) return;
-
-            try {
-                const res = await fetch('/api/verify-captcha', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ captchaToken, answer })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    uploadSessionToken = data.uploadSessionToken;
-                    document.getElementById('verify-card').classList.add('hidden');
-                    routeView();
-                } else {
-                    document.getElementById('captcha-error').classList.remove('hidden');
-                    fetchCaptcha();
-                }
-            } catch (e) {
-                showToast('Doğrulama sırasında hata oluştu.', 'error');
-            }
-        }
-
-        function routeView() {
-            const path = window.location.pathname;
-            if (path.startsWith('/dosya/')) {
-                const id = path.split('/dosya/')[1];
-                loadDownloadView(id);
-            } else {
-                document.getElementById('main-card').classList.remove('hidden');
-            }
-        }
-
-        function openModal() {
-            const files = getMyFiles();
-            if (files.length >= 3) {
-                showToast('En fazla 3 dosya yükleyebilirsiniz. Lütfen birini silin.', 'error');
-                return;
-            }
-            document.getElementById('main-card').classList.add('hidden');
-            document.getElementById('modal-card').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-            resetUploadForm();
-        }
-
-        function openMyFiles() {
-            renderMyFilesList();
-            document.getElementById('main-card').classList.add('hidden');
-            document.getElementById('my-files-card').classList.remove('hidden');
-        }
-
-        function closeMyFiles() {
-            document.getElementById('my-files-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-        }
-
-        function renderMyFilesList() {
-            const files = getMyFiles();
-            const container = document.getElementById('my-files-list');
-            container.innerHTML = '';
-
-            if (files.length === 0) {
-                container.innerHTML = '<div style="text-align:center;font-size:13px;color:var(--text-secondary);padding:16px 0;">Henüz yüklenmiş bir dosyanız yok.</div>';
-                return;
-            }
-
-            files.forEach(file => {
-                const fileEl = document.createElement('div');
-                fileEl.className = 'my-file-card';
-                fileEl.innerHTML = `
-                    <div class="my-file-header">
-                        <div class="my-file-title">${escapeHtml(file.title)}</div>
-                    </div>
-                    <div class="my-file-sub">${escapeHtml(file.originalName)} • ${formatFileSize(file.size)}</div>
-                    <div class="my-file-actions">
-                        <button onclick="copyCustomLink('${file.link}')">Kopyala</button>
-                        <button class="secondary" onclick="openQrModal('${file.id}', '${file.link}', '${escapeHtml(file.title)}')">QR Kod</button>
-                        <button class="danger" onclick="deleteMyFile('${file.id}')">Sil</button>
-                    </div>
-                `;
-                container.appendChild(fileEl);
-            });
-        }
-
-        function escapeHtml(text) {
-            if (!text) return '';
-            return text.replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            });
-        }
-
-        async function deleteMyFile(id) {
-            if (!confirm('Bu dosyayı silmek istediğinize emin misiniz?')) return;
-
-            try {
-                const res = await fetch(`/api/file/${id}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) {
-                    removeMyFile(id);
-                    renderMyFilesList();
-                    showToast('Dosya başarıyla silindi.', 'success');
-                } else {
-                    showToast(data.error || 'Silme işlemi başarısız.', 'error');
-                }
-            } catch (e) {
-                showToast('Sunucu hatası oluştu.', 'error');
-            }
-        }
-
-        function resetToMain() {
-            document.getElementById('result-card').classList.add('hidden');
-            document.getElementById('main-card').classList.remove('hidden');
-            resetUploadForm();
-        }
-
-        function resetUploadForm() {
-            document.getElementById('uploadForm').reset();
-            document.getElementById('dropzone-title').innerText = 'Dosya Seçin veya Sürükleyin';
-            document.getElementById('dropzone-subtext').innerText = 'Tüm dosya türleri desteklenmektedir';
-        }
-
-        function handleFileSelect(input) {
-            const titleElem = document.getElementById('dropzone-title');
-            const subtextElem = document.getElementById('dropzone-subtext');
-
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                if (file.size > 10 * 1024 * 1024) {
-                    showToast('Seçilen dosya 10 MB sınırını aşıyor.', 'error');
-                    input.value = '';
-                    titleElem.innerText = 'Dosya Seçin veya Sürükleyin';
-                    subtextElem.innerText = 'Tüm dosya türleri desteklenmektedir';
-                    return;
-                }
-                titleElem.innerText = file.name;
-                subtextElem.innerText = formatFileSize(file.size);
-            } else {
-                titleElem.innerText = 'Dosya Seçin veya Sürükleyin';
-                subtextElem.innerText = 'Tüm dosya türleri desteklenmektedir';
-            }
-        }
-
-        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const files = getMyFiles();
-            if (files.length >= 3) {
-                showToast('En fazla 3 dosya yükleyebilirsiniz.', 'error');
-                return;
-            }
-
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const fileInput = document.getElementById('file');
-
-            if (fileInput.files.length === 0) return;
-
-            const selectedFile = fileInput.files[0];
-            if (selectedFile.size > 10 * 1024 * 1024) {
-                showToast('Seçilen dosya 10 MB sınırını aşıyor.', 'error');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('description', description);
-            formData.append('file', selectedFile);
-
-            const btn = document.getElementById('uploadBtn');
-            btn.disabled = true;
-            btn.innerText = "Yükleniyor...";
-
-            try {
-                const response = await fetch('/api/upload', {
-                    method: 'POST',
-                    headers: {
-                        'x-upload-token': uploadSessionToken
-                    },
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.success) {
-                    const fullLink = `${window.location.origin}/dosya/${data.id}`;
-                    
-                    addMyFile({
-                        id: data.id,
-                        title: data.title,
-                        originalName: data.originalName,
-                        size: data.size,
-                        link: fullLink
-                    });
-
-                    document.getElementById('generated-link').innerText = fullLink;
-                    
-                    const qrContainer = document.getElementById('result-qrcode');
-                    qrContainer.innerHTML = '';
-                    new QRCode(qrContainer, {
-                        text: fullLink,
-                        width: 160,
-                        height: 160,
-                        colorDark: "#0f172a",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-
-                    currentQrFileId = data.id;
-
-                    document.getElementById('modal-card').classList.add('hidden');
-                    document.getElementById('result-card').classList.remove('hidden');
-                } else {
-                    showToast(data.error || 'Yükleme hatası oluştu.', 'error');
-                    if (response.status === 403) {
-                        setTimeout(() => location.reload(), 1500);
-                    }
-                }
-            } catch (err) {
-                showToast('Bir hata oluştu.', 'error');
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Yükle";
-            }
+              </a>
+              <div class="card-actions">
+                <button class="btn btn-primary btn-sm" onclick="copyLink('${fileUrl}')">Kopyala</button>
+                <button class="btn btn-purple btn-sm" onclick="openQrModal('${fileUrl}')">QR Kod</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFile('${file.id}')">Sil</button>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(() => {
+          container.innerHTML = '<p style="color:#ef4444; font-size:14px;">Dosyalar alınamadı.</p>';
         });
+    }
 
-        async function loadDownloadView(id) {
-            try {
-                const res = await fetch(`/api/file/${id}`);
-                if (!res.ok) {
-                    document.getElementById('download-card').classList.remove('hidden');
-                    document.getElementById('view-title').innerText = "Dosya Bulunamadı";
-                    document.getElementById('downloadBtn').classList.add('hidden');
-                    return;
-                }
-                const data = await res.json();
-                document.getElementById('view-title').innerText = data.title;
-                document.getElementById('view-desc').innerText = data.description || 'Açıklama yok';
-                document.getElementById('view-filename').innerText = data.originalName;
-                document.getElementById('view-size').innerText = formatFileSize(data.size);
+    function copyLink(url) {
+      navigator.clipboard.writeText(url);
+      vibrate(30);
+      showToast('Link kopyalandı!');
+    }
 
-                const dlBtn = document.getElementById('downloadBtn');
-                dlBtn.onclick = () => {
-                    window.location.href = data.downloadUrl;
-                };
+    function openQrModal(url) {
+      setupReadyView({ id: url.split('/').pop() });
+      document.getElementById('readyLinkText').innerText = url;
+      showView('viewReady');
+      vibrate(30);
+    }
 
-                document.getElementById('download-card').classList.remove('hidden');
-            } catch (e) {
-                showToast('Dosya bilgileri alınamadı.', 'error');
+    function deleteFile(id) {
+      vibrate(50);
+      fetch('/api/files/' + id, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            const el = document.getElementById('file-card-' + id);
+            if (el) {
+              el.style.opacity = '0';
+              el.style.transform = 'scale(0.9)';
+              setTimeout(() => el.remove(), 300);
             }
-        }
-
-        function copyLink() {
-            const linkText = document.getElementById('generated-link').innerText;
-            copyCustomLink(linkText);
-        }
-
-        function copyCustomLink(linkText) {
-            navigator.clipboard.writeText(linkText).then(() => {
-                showToast('Link kopyalandı!', 'success');
-            });
-        }
-
-        function downloadQrFromContainer(containerId, filename) {
-            const container = document.getElementById(containerId);
-            const img = container.querySelector('img');
-            const canvas = container.querySelector('canvas');
-            let dataUrl = '';
-
-            if (canvas) {
-                dataUrl = canvas.toDataURL('image/png');
-            } else if (img) {
-                dataUrl = img.src;
-            }
-
-            if (!dataUrl) {
-                showToast('QR Kod indirilemedi.', 'error');
-                return;
-            }
-
-            const a = document.createElement('a');
-            a.href = dataUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function downloadResultQr() {
-            downloadQrFromContainer('result-qrcode', `DosYap_QR_${currentQrFileId}.png`);
-        }
-
-        function openQrModal(id, link, title) {
-            currentQrFileId = id;
-            document.getElementById('qr-modal-title').innerText = title;
-            const container = document.getElementById('modal-qrcode');
-            container.innerHTML = '';
-            new QRCode(container, {
-                text: link,
-                width: 160,
-                height: 160,
-                colorDark: "#0f172a",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-            document.getElementById('my-files-card').classList.add('hidden');
-            document.getElementById('qr-modal-card').classList.remove('hidden');
-        }
-
-        function closeQrModal() {
-            document.getElementById('qr-modal-card').classList.add('hidden');
-            document.getElementById('my-files-card').classList.remove('hidden');
-        }
-
-        function downloadModalQr() {
-            downloadQrFromContainer('modal-qrcode', `DosYap_QR_${currentQrFileId}.png`);
-        }
-
-        window.onload = () => {
-            fetchCaptcha();
-            updateMyFilesCount();
-        };
-    </script>
+            showToast('Dosya silindi!');
+          } else {
+            showToast('Silme başarısız!');
+          }
+        })
+        .catch(() => {
+          showToast('Silme hatası!');
+        });
+    }
+  </script>
 </body>
 </html>
